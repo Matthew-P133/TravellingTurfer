@@ -1,10 +1,19 @@
 {% extends 'routing/base.html' %}
+{% load static %}
 
 {% block title_block %}
     Map
 {% endblock %}
 
+{% block script_block %}
+<script src="{% static 'js/map.js' %}"></script>
+<link rel="stylesheet" href="{% static '/style/map.css' %}">
+{% endblock %}
 
 {% block body_block %}
-    [MAP]
+
+    <div id="map">
+
+    </div>
+
 {% endblock %}
