@@ -6,11 +6,13 @@ def map(request):
 
     # TODO display map to user
 
-    return HttpResponse("MAP")
+    return render(request, 'routing/map.html')
 
 
 def route(request, id):
 
     # TODO display created route to user
 
-    return HttpResponse(f"Route {id}")
+    context_dict = {"id":id}
+
+    return render(request, 'routing/route.html', context=context_dict)
