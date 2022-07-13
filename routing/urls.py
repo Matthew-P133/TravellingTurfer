@@ -7,4 +7,5 @@ urlpatterns = [
     path('', views.map, name='map'),
     path('map', views.map, name='map'),
     path('route<int:id>/', views.route),
+    path('zones', views.zones),
 ]
