@@ -1,6 +1,7 @@
 import datetime
 from django.db import models
 
+# stores information relating to Turf zones
 class Zone(models.Model):
 
     id = models.IntegerField(primary_key=True)
@@ -12,5 +13,5 @@ class Zone(models.Model):
     points_per_hour = models.IntegerField(default=0)
     takeover_points = models.IntegerField(default=0)
 
-
+    
 

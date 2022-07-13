@@ -1,7 +1,8 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 import requests
 import json
+from routing.models import Zone
 
 
 
@@ -25,10 +26,15 @@ def zones(request):
     southWestLat = request.POST['southWestLat']
     southWestLong = request.POST['southWestLong']
 
-    data = [{'northEast' : {'latitude':northEastLat, 'longitude':northEastLong}, 'southWest' : {'latitude':southWestLat, 'longitude':southWestLong}}]
-    
-    x = requests.post("http://api.turfgame.com/v4/zones", headers = {"Content-Type": "application/json"}, data=json.dumps(data))
-    print(x.content)
+    # get zones from Turf API
 
-    return HttpResponse(x.content)
+    #data = [{'northEast' : {'latitude':northEastLat, 'longitude':northEastLong}, 'southWest' : {'latitude':southWestLat, 'longitude':southWestLong}}]
+    #response = requests.post("http://api.turfgame.com/v4/zones", headers = {"Content-Type": "application/json"}, data=json.dumps(data))
+    #zones_json = response.content
+
+    # get zones from locally cached zones
+
+    zones = Zone.objects.filter(latitude__gte=southWestLat).filter(longitude__gte=southWestLong).filter(latitude__lte=northEastLat).filter(longitude__lte=northEastLong).values()
+    
+    return JsonResponse(list(zones), safe=False)
     
