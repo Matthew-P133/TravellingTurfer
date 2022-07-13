@@ -7,7 +7,7 @@ import json
 
 # main map page
 def map(request):
-    
+
     return render(request, 'routing/map.html')
 
 # page for already created route
@@ -28,6 +28,7 @@ def zones(request):
     data = [{'northEast' : {'latitude':northEastLat, 'longitude':northEastLong}, 'southWest' : {'latitude':southWestLat, 'longitude':southWestLong}}]
     
     x = requests.post("http://api.turfgame.com/v4/zones", headers = {"Content-Type": "application/json"}, data=json.dumps(data))
+    print(x.content)
 
     return HttpResponse(x.content)
     
