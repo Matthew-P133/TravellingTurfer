@@ -1,11 +1,15 @@
 window.onload = function() {
 
     // display map centred on sweden when page is fully loaded
-    var map = L.map('map', {renderer: L.canvas()}).setView([59.3357, 18.07292], 11);
+    var map = L.map('map').setView([59.3357, 18.07292], 11);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
-        attribution: '© OpenStreetMap'
+        attribution: '© OpenStreetMap',
+        preferCanvas: true,
     }).addTo(map);
+
+
+    markerGroup = L.layerGroup().addTo(map);
 
 
     // stores zones which have just been loaded onto the map
@@ -20,12 +24,13 @@ window.onload = function() {
 
     // when map moves (on pan or zoom) get and display zones
     function onMapMoveEnd(e) {
-        getZones(map.getBounds().getNorthEast(), map.getBounds().getSouthWest());
-        try {
+        markerGroup.clearLayers();
+        if (map.getZoom() >= 11) {
+            document.getElementById("prompt").innerHTML = "";
+            getZones(map.getBounds().getNorthEast(), map.getBounds().getSouthWest());
             drawZones();
-        }
-        catch(err) {
-            document.getElementById("prompt").innerHTML = "Try zooming in to see zones"
+        } else {
+            document.getElementById("prompt").innerHTML = "Zoom in to see zones"
         }
     }
 
@@ -48,7 +53,7 @@ window.onload = function() {
         zoneArray.forEach(zone => {
 
             zoneLatLng = L.latLng((zone.latitude), (zone.longitude));
-            circle_marker = L.circleMarker(zoneLatLng, {'radius': 2}).addTo(map);
+            circle_marker = L.circleMarker(zoneLatLng, {'radius': 2}).addTo(markerGroup);
             circle_marker.on("click", onCircleClick);
         });
 
