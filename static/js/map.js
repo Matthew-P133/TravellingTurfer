@@ -10,28 +10,46 @@ window.onload = function() {
 
 
     markerGroup = L.layerGroup().addTo(map);
+    selectedMarkerGroup = L.layerGroup().addTo(map);
 
 
     // defines action to take when a zone marker is clicked
     function onCircleClick(e) {
-        alert("TODO: display zone stats for zone with lat/lng: " + e.latlng);
+        // select marker
+         if (markerGroup.hasLayer(e.target)) { 
+            e.target.setStyle({color: '#ff0000'});
+            markerGroup.removeLayer(e.target);
+            selectedMarkerGroup.addLayer(e.target);
+        } else { // deselect marker
+            e.target.setStyle({color: '#3388ff'});
+            selectedMarkerGroup.removeLayer(e.target);
+            markerGroup.addLayer(e.target);
+        }
     }
 
 
     // when map moves (on pan or zoom) get and display zones
     function onMapMoveEnd(e) {
-        //markerGroup.clearLayers();
+        
+        
         if (map.getZoom() >= 11) {
+
+            updateZones(map.getBounds().getNorthEast(), map.getBounds().getSouthWest());
+
             document.getElementById("prompt").innerHTML = "";
-            getZones(map.getBounds().getNorthEast(), map.getBounds().getSouthWest());
+            map.hasLayer(markerGroup) ? {} : map.addLayer(markerGroup);
+            map.hasLayer(selectedMarkerGroup) ? {} : map.addLayer(selectedMarkerGroup);
         } else {
+            // zoomed out too far
             document.getElementById("prompt").innerHTML = "Zoom in to see zones"
+            map.removeLayer(markerGroup);
+            map.removeLayer(selectedMarkerGroup);
         }
     }
 
 
     // query Turf API for zones within specified bounds
-    function getZones(northEast, southWest) {
+    function updateZones(northEast, southWest) {
 
         zonePromise = fetch("zones", {
             method: 'POST', 
@@ -52,13 +70,29 @@ window.onload = function() {
 
     // display zones on the map
     function drawZones(zoneArray) {
+
+        // clear all (unselected) zones before drawing new ones (avoids slowdown associated with displaying lots of zones)
+        markerGroup.clearLayers();
+
+        // put each zone on map (if not already present as a selected zone) and attach event listener to each
         zoneArray.forEach(zone => {
 
             zoneLatLng = L.latLng((zone.latitude), (zone.longitude));
-            circle_marker = L.circleMarker(zoneLatLng, {'radius': 2}).addTo(markerGroup);
-            circle_marker.on("click", onCircleClick);
-        });
+            zonePresent = false;
 
+            selectedMarkerGroup.eachLayer(function(layer) {
+                if (layer instanceof L.Circle) {
+                    if (layer.getLatLng().equals(zoneLatLng)) {
+                        zonePresent = true;
+                    }
+                }
+            });
+            
+            if (!zonePresent) {
+                circle_marker = L.circle(zoneLatLng, {'radius': 30}).addTo(markerGroup);
+                circle_marker.on("click", onCircleClick);
+            }
+        });
     }
 
 
