@@ -21,10 +21,12 @@ def route(request, id):
 
 def zones(request):
 
-    northEastLat = request.POST['northEastLat']
-    northEastLong = request.POST['northEastLong']
-    southWestLat = request.POST['southWestLat']
-    southWestLong = request.POST['southWestLong']
+    coords = json.loads(request.body)
+
+    northEastLat = coords['northEastLat']
+    northEastLong = coords['northEastLong']
+    southWestLat = coords['southWestLat']
+    southWestLong = coords['southWestLong']
 
     # get zones from Turf API
 

@@ -12,10 +12,6 @@ window.onload = function() {
     markerGroup = L.layerGroup().addTo(map);
 
 
-    // stores zones which have just been loaded onto the map
-    var zoneArray;
-
-
     // defines action to take when a zone marker is clicked
     function onCircleClick(e) {
         alert("TODO: display zone stats for zone with lat/lng: " + e.latlng);
@@ -24,11 +20,10 @@ window.onload = function() {
 
     // when map moves (on pan or zoom) get and display zones
     function onMapMoveEnd(e) {
-        markerGroup.clearLayers();
+        //markerGroup.clearLayers();
         if (map.getZoom() >= 11) {
             document.getElementById("prompt").innerHTML = "";
             getZones(map.getBounds().getNorthEast(), map.getBounds().getSouthWest());
-            drawZones();
         } else {
             document.getElementById("prompt").innerHTML = "Zoom in to see zones"
         }
@@ -37,19 +32,26 @@ window.onload = function() {
 
     // query Turf API for zones within specified bounds
     function getZones(northEast, southWest) {
-        var xmlHttp = new XMLHttpRequest();
-        xmlHttp.open("POST", "zones", false);
-        params = 'northEastLat=' + northEast.lat + "&" + 'northEastLong=' + northEast.lng + "&"
-                    + 'southWestLat=' + southWest.lat + "&" + 'southWestLong=' + southWest.lng;
-        xmlHttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-        xmlHttp.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
-        xmlHttp.send(params);
-        zoneArray = JSON.parse(xmlHttp.responseText);
+
+        zonePromise = fetch("zones", {
+            method: 'POST', 
+            headers: {'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')},
+            body: JSON.stringify({
+                'northEastLat': northEast.lat,
+                'northEastLong': northEast.lng,
+                'southWestLat': southWest.lat,
+                'southWestLong': southWest.lng
+            }),
+            credentials: 'same-origin',
+        })
+        .then(response => response.json())
+        .then(data => drawZones(data));
     }
 
 
     // display zones on the map
-    function drawZones() {
+    function drawZones(zoneArray) {
         zoneArray.forEach(zone => {
 
             zoneLatLng = L.latLng((zone.latitude), (zone.longitude));
