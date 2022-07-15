@@ -25,7 +25,7 @@ window.onload = function() {
             selectedMarkerGroup.removeLayer(e.target);
             markerGroup.addLayer(e.target);
         }
-
+        // keep display of selected zone statistics up to date
         updateStats();
     }
 
@@ -69,11 +69,21 @@ window.onload = function() {
         .then(data => drawZones(data));
     }
 
+
+    // calculates and updates aggregate statistics for selected zones
     function updateStats() {
         selectedZones = 0;
-        selectedMarkerGroup.eachLayer(function() {selectedZones++});
-        document.getElementById("selectedZoneStats").innerHTML = selectedZones;
+        takeoverPoints = 0;
+        pointsPerHour = 0;
 
+        selectedMarkerGroup.eachLayer(function(zone) { 
+            selectedZones++;
+            takeoverPoints += zone.options.takeover_points;
+            pointsPerHour += zone.options.points_per_hour;
+        });
+        document.getElementById("selectedZoneCount").innerHTML = selectedZones;
+        document.getElementById("selectedZoneTakeoverPoints").innerHTML = takeoverPoints;
+        document.getElementById("selectedZonePointsPerHour").innerHTML = pointsPerHour;
     }
 
 
@@ -100,6 +110,9 @@ window.onload = function() {
             if (!zonePresent) {
                 circle_marker = L.circle(zoneLatLng, {'radius': 30}).addTo(markerGroup);
                 circle_marker.on("click", onCircleClick);
+
+                // attach zone properties to marker
+                L.setOptions(circle_marker, zone);
             }
         });
     }
@@ -124,5 +137,7 @@ window.onload = function() {
         return cookieValue
     }
 };
+
+
 
 
