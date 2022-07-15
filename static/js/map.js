@@ -25,6 +25,8 @@ window.onload = function() {
             selectedMarkerGroup.removeLayer(e.target);
             markerGroup.addLayer(e.target);
         }
+
+        updateStats();
     }
 
 
@@ -65,6 +67,13 @@ window.onload = function() {
         })
         .then(response => response.json())
         .then(data => drawZones(data));
+    }
+
+    function updateStats() {
+        selectedZones = 0;
+        selectedMarkerGroup.eachLayer(function() {selectedZones++});
+        document.getElementById("selectedZoneStats").innerHTML = selectedZones;
+
     }
 
 
