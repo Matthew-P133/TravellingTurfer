@@ -1,5 +1,7 @@
 from django.urls import path
 from routing import views
+from django.contrib.staticfiles.storage import staticfiles_storage
+from django.views.generic.base import RedirectView
 
 app_name = 'routing'
 
@@ -8,4 +10,5 @@ urlpatterns = [
     path('map/', views.map, name='map'),
     path('route<int:id>/', views.route, name='route'),
     path('zones/', views.zones),
+    path('favicon.ico', RedirectView.as_view(url=staticfiles_storage.url('img/favicon.ico')))
 ]
