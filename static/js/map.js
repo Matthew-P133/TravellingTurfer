@@ -33,7 +33,6 @@ window.onload = function() {
     // when map moves (on pan or zoom) get and display zones
     function onMapMoveEnd(e) {
         
-        
         if (map.getZoom() >= 11) {
 
             updateZones(map.getBounds().getNorthEast(), map.getBounds().getSouthWest());
