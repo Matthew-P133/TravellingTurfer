@@ -1,5 +1,6 @@
 import datetime
 from django.db import models
+from django.utils.timezone import now
 
 # stores information relating to Turf zones
 class Zone(models.Model):
@@ -8,7 +9,7 @@ class Zone(models.Model):
     name = models.CharField(max_length=100)
     latitude = models.FloatField(default=0.0)
     longitude = models.FloatField(default=0.0)
-    date_created = models.DateTimeField(default=datetime.datetime.now())
+    date_created = models.DateTimeField(default=now)
     takeovers = models.IntegerField(default=0)
     points_per_hour = models.IntegerField(default=0)
     takeover_points = models.IntegerField(default=0)

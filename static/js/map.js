@@ -53,7 +53,7 @@ window.onload = function() {
     // query Turf API for zones within specified bounds
     function updateZones(northEast, southWest) {
 
-        zonePromise = fetch("zones", {
+        zonePromise = fetch("/zones/", {
             method: 'POST', 
             headers: {'Content-Type': 'application/json',
                     'X-CSRFToken': getCookie('csrftoken')},
@@ -89,6 +89,7 @@ window.onload = function() {
 
     // display zones on the map
     function drawZones(zoneArray) {
+
 
         // clear all (unselected) zones before drawing new ones (avoids slowdown associated with displaying lots of zones)
         markerGroup.clearLayers();
