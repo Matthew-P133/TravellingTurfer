@@ -1,4 +1,4 @@
-window.onload = function() {
+window.onload = function () {
 
     // display map centred on sweden when page is fully loaded
     var map = L.map('map').setView([59.3357, 18.07292], 11);
@@ -16,12 +16,12 @@ window.onload = function() {
     // defines action to take when a zone marker is clicked
     function onCircleClick(e) {
         // select marker
-         if (markerGroup.hasLayer(e.target)) { 
-            e.target.setStyle({color: '#ff0000'});
+        if (markerGroup.hasLayer(e.target)) {
+            e.target.setStyle({ color: '#ff0000' });
             markerGroup.removeLayer(e.target);
             selectedMarkerGroup.addLayer(e.target);
         } else { // deselect marker
-            e.target.setStyle({color: '#3388ff'});
+            e.target.setStyle({ color: '#3388ff' });
             selectedMarkerGroup.removeLayer(e.target);
             markerGroup.addLayer(e.target);
         }
@@ -32,7 +32,7 @@ window.onload = function() {
 
     // when map moves (on pan or zoom) get and display zones
     function onMapMoveEnd(e) {
-        
+
         if (map.getZoom() >= 11) {
 
             updateZones(map.getBounds().getNorthEast(), map.getBounds().getSouthWest());
@@ -53,9 +53,11 @@ window.onload = function() {
     function updateZones(northEast, southWest) {
 
         zonePromise = fetch("/zones/", {
-            method: 'POST', 
-            headers: {'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken')},
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
             body: JSON.stringify({
                 'northEastLat': northEast.lat,
                 'northEastLong': northEast.lng,
@@ -64,8 +66,8 @@ window.onload = function() {
             }),
             credentials: 'same-origin',
         })
-        .then(response => response.json())
-        .then(data => drawZones(data));
+            .then(response => response.json())
+            .then(data => drawZones(data));
     }
 
 
@@ -75,7 +77,7 @@ window.onload = function() {
         takeoverPoints = 0;
         pointsPerHour = 0;
 
-        selectedMarkerGroup.eachLayer(function(zone) { 
+        selectedMarkerGroup.eachLayer(function (zone) {
             selectedZones++;
             takeoverPoints += zone.options.takeover_points;
             pointsPerHour += zone.options.points_per_hour;
@@ -99,16 +101,16 @@ window.onload = function() {
             zoneLatLng = L.latLng((zone.latitude), (zone.longitude));
             zonePresent = false;
 
-            selectedMarkerGroup.eachLayer(function(layer) {
+            selectedMarkerGroup.eachLayer(function (layer) {
                 if (layer instanceof L.Circle) {
                     if (layer.getLatLng().equals(zoneLatLng)) {
                         zonePresent = true;
                     }
                 }
             });
-            
+
             if (!zonePresent) {
-                circle_marker = L.circle(zoneLatLng, {'radius': 30}).addTo(markerGroup);
+                circle_marker = L.circle(zoneLatLng, { 'radius': 30 }).addTo(markerGroup);
                 circle_marker.on("click", onCircleClick);
 
                 // attach zone properties to marker
@@ -135,6 +137,27 @@ window.onload = function() {
             }
         }
         return cookieValue
+    }
+
+    document.getElementById('createRoute').addEventListener('click', createRoute);
+
+    function createRoute() {
+
+        // post IDs of zones to be routed to back end
+        var payload = [];
+        selectedMarkerGroup.eachLayer(marker => payload.push(marker.options.id))
+
+        fetch("/optimise/", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify(payload),
+            credentials: 'same-origin',
+        }).then(response => response.text())
+        .then(response => alert(response));
+
     }
 };
 
