@@ -4,7 +4,7 @@ from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
 import requests
 import json
-from routing.models import Zone, Distance
+from routing.models import Waypoints, Zone, Distance, Route, createRoute
 
 #import algorithms
 
@@ -106,12 +106,13 @@ def bruteForceRoute(zones, distanceMatrix):
             longestDistance = distance
             longestRoute = route
 
-    output = f"Shortest: {shortestRoute} | {shortestDistance} km\n"
-    output += f"Longest: {longestRoute} | {longestDistance} km"
+    
+    route = createRoute(shortestRoute)    
 
-    # TODO - save route to DB
+    #output = f"Shortest: {shortestRoute} | {shortestDistance} km\n"
+    #output += f"Longest: {longestRoute} | {longestDistance} km"
 
-    return output
+    return route.id
     
 
 def routeDistance(route):
@@ -142,3 +143,22 @@ def findAllRoutes(route, notInRoute, routes):
             newNotInRoute = notInRoute.copy()
             newNotInRoute.remove(zone)
             findAllRoutes(newRoute, newNotInRoute, routes)
+
+
+# generates geoJSON for display of a given route
+def generate(request):
+
+    id = json.loads(request.body)['id']
+    
+    route = Route.objects.get(id=id)
+    coordinates = [[x.zone.longitude, x.zone.latitude] for x in Waypoints.objects.filter(route=route)]
+    type = 'LineString'
+
+    geoJSON = {
+        'type': type,
+        'coordinates': coordinates
+    }
+
+    return JsonResponse(geoJSON)
+
+

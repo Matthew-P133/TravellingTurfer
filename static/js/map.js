@@ -149,6 +149,7 @@ window.onload = function () {
         var payload = [];
         selectedMarkerGroup.eachLayer(marker => payload.push(marker.options.id))
 
+        // make request to back_end optimisation engine - when ready redirect to route page
         fetch("/optimise/", {
             method: 'POST',
             headers: {
@@ -158,7 +159,7 @@ window.onload = function () {
             body: JSON.stringify(payload),
             credentials: 'same-origin',
         }).then(response => response.text())
-        .then(response => alert(response)); // TODO - redirect to route page
+        .then(response => window.location.replace("http://127.0.0.1:8000/route" + response));
 
     }
 };
