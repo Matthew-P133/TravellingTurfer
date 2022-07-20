@@ -8,9 +8,10 @@ window.onload = function () {
         preferCanvas: true,
     }).addTo(map);
 
-
     markerGroup = L.layerGroup().addTo(map);
     selectedMarkerGroup = L.layerGroup().addTo(map);
+
+    map.whenReady(onMapMoveEnd);
 
 
     // defines action to take when a zone marker is clicked
@@ -122,6 +123,7 @@ window.onload = function () {
 
     // attach event functions to event listeners
     map.on("moveend", onMapMoveEnd);
+    
 
 
     // returns value of the cookie with a given name, or null if the cookie is undefined
@@ -156,7 +158,7 @@ window.onload = function () {
             body: JSON.stringify(payload),
             credentials: 'same-origin',
         }).then(response => response.text())
-        .then(response => alert(response));
+        .then(response => alert(response)); // TODO - redirect to route page
 
     }
 };
