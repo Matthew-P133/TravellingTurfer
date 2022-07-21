@@ -6,8 +6,6 @@ import requests
 import json
 from routing.models import Waypoints, Zone, Distance, Route, createRoute
 
-#import algorithms
-
 
 # redirect / to map page
 def index(request):
@@ -52,14 +50,9 @@ def zones(request):
 
 def optimise(request):
 
-    # TODO - calculate optimum route between zones in request
-
     zones = json.loads(request.body)
-    
-    print(zones)
 
-    # populate (straight line) distance matrix from database
-
+    # populate distance matrix from database
     distanceMatrix = { zone:{} for zone in zones}
 
     for zoneA in zones:
@@ -70,16 +63,17 @@ def optimise(request):
             distanceMatrix[zoneA].update({zoneB: distance})
 
     # calculate shortest route
-
     response = bruteForceRoute(zones, distanceMatrix)
 
-    # TODO - redirect to route page showing newly created route
+    # returns route id of newly created route; javascript redirects user route page
     return HttpResponse(response)
 
 
 def bruteForceRoute(zones, distanceMatrix):
 
     routeLength = len(zones)
+
+    # all possible routes
     routes = []
 
     # add first zone to route
@@ -91,26 +85,18 @@ def bruteForceRoute(zones, distanceMatrix):
     # brute force generate all routes
     findAllRoutes(route, notInRoute, routes)
 
-
-    # find shortest (and longest) route
+    # find shortest
     shortestDistance = 0
-    longestDistance = 0
     shortestRoute = []
-    longestRoute = []
+    
     for route in routes:
         distance = routeDistance(route)
         if (distance < shortestDistance or shortestDistance == 0):
             shortestDistance = distance
             shortestRoute = route
-        if (distance > longestDistance):
-            longestDistance = distance
-            longestRoute = route
 
-    
+    # save shortest route to database
     route = createRoute(shortestRoute)    
-
-    #output = f"Shortest: {shortestRoute} | {shortestDistance} km\n"
-    #output += f"Longest: {longestRoute} | {longestDistance} km"
 
     return route.id
     
@@ -147,17 +133,9 @@ def findAllRoutes(route, notInRoute, routes):
 
 # generates geoJSON for display of a given route
 def generate(request):
-
     id = json.loads(request.body)['id']
-    
     route = Route.objects.get(id=id)
-    coordinates = [[x.zone.longitude, x.zone.latitude] for x in Waypoints.objects.filter(route=route)]
-    type = 'LineString'
-
-    geoJSON = {
-        'type': type,
-        'coordinates': coordinates
-    }
+    geoJSON = route.getGeoJSON()
 
     return JsonResponse(geoJSON)
 

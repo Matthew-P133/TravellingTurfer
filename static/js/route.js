@@ -1,8 +1,5 @@
 window.onload = function () {
 
-    // get route id from page
-    id = document.getElementById('id').innerHTML;
-     
     // display map
     var map = L.map('map').setView([59.3357, 18.07292], 11);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -11,27 +8,13 @@ window.onload = function () {
         preferCanvas: true,
     }).addTo(map);
 
-
-    // get route from back end
-    getRoute(id);
+    // add route to map
+    id = document.getElementById('id').innerHTML;
+    loadRoute(id);
 
     
-    // draw route on map
-
-    var style = {
-        "color": "#ff7800",
-        "weight": 5,
-        "opacity": 0.65
-    };
-
-    function drawRoute(data) {
-        centreMap(data);
-        L.geoJSON(data, {style: style}).addTo(map);
-    }
-
-
-    // get route from backend
-    function getRoute(id) {
+    // gets route from back end and draws it on the map
+    function loadRoute(id) {
 
         zonePromise = fetch("/generate/", {
             method: 'POST',
@@ -76,10 +59,22 @@ window.onload = function () {
 
         centre = [latitudeSum/coordinates.length, longitudeSum/coordinates.length]
 
-        map.setView(centre)
+        // TODO - set zoom intelligently so that route just all visible
+        zoomLevel = 16
+
+        map.setView(centre, zoomLevel)
     }
 
+    style = {
+        "color": "#ff7800",
+        "weight": 5,
+        "opacity": 0.65
+    };
 
+    function drawRoute(data) {
+        centreMap(data);
+        L.geoJSON(data, {style: style}).addTo(map);
+    }
 };
 
 

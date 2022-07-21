@@ -3,6 +3,10 @@ from re import L
 from django.db import models
 from django.utils.timezone import now
 from geopy import distance
+import json
+import requests
+import dotenv
+import os
 
 
 # stores information relating to Turf zones
@@ -36,6 +40,30 @@ class Route(models.Model):
                 distance += Distance.objects.get(zone_a=start, zone_b=end).distance
 
         return distance
+
+    def getGeoJSON(self):
+
+        waypoints = Waypoints.objects.filter(route=self)
+
+        coordinates = []
+
+        for i, zone in enumerate(waypoints):
+            if i != len(waypoints)-1:
+                start = waypoints[i].zone
+                end = waypoints[i+1].zone
+                segment = Distance.objects.get(zone_a=start, zone_b=end)
+                print(json.loads(segment.geoJSON))
+                segmentCoordinates = json.loads(segment.geoJSON)['features'][0]['geometry']['coordinates']
+                for coordinate in segmentCoordinates:
+                    coordinates.append(coordinate)
+                
+        geoJSON = {
+            'type': 'LineString',
+            'coordinates': coordinates
+        }
+
+        return geoJSON
+
     
 def createRoute(zones):
 
@@ -67,13 +95,33 @@ class Distance(models.Model):
     zone_b = models.ForeignKey(Zone, on_delete=models.CASCADE, related_name='end')
     distance = models.FloatField(default=0.0)
     date_obtained = models.DateTimeField(default=now)
+    geoJSON = models.CharField(max_length=10000, default='')
 
-    # calculate distance when a new pair is added to the database
+    # generate geoJSON for A->B and get A->B distance...
     def save(self, *args, **kwargs):
         
         start = self.zone_a
         end = self.zone_b
-        self.distance = straightLineDistance(start, end)
+
+        # ...using straight lines
+
+        #self.distance = straightLineDistance(start, end)
+        #coordinates = [[zone.longitude, zone.latitude] for zone in [self.zone_a, self.zone_b]]
+        
+        #geoJSON = {
+        #    'type': 'LineString',
+        #    'coordinates': coordinates
+        #}
+
+        # ... using 'snap to road'
+
+        if start.id == end.id:
+            self.distance = 0
+        else:
+            geoJSON = route(start, end)
+            self.distance = geoJSON['features'][0]['properties']['summary']['distance']
+            self.geoJSON = json.dumps(geoJSON)
+
         super().save(*args, **kwargs)
         
 
@@ -85,7 +133,12 @@ def straightLineDistance(start, end):
     straightLineDistance = distance.distance(startCoord, endCoord).km
     return straightLineDistance
 
+# helper method to get snap to road route from OpenRouteService
+def route(start, end):
 
+    dotenv.load_dotenv()
+    api_key=os.getenv('api_key')
+    response = requests.get(f"https://api.openrouteservice.org/v2/directions/foot-walking?api_key={api_key}&start={start.longitude},{start.latitude}&end={end.longitude},{end.latitude}")
 
-
+    return json.loads(response.content)
 
