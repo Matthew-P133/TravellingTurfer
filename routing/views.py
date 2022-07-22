@@ -55,6 +55,9 @@ def optimise(request):
     # populate distance matrix from database
     distanceMatrix = { zone:{} for zone in zones}
 
+    # toggle straight line / snap to map routing
+    straight = True
+
     for zoneA in zones:
         for zoneB in zones:
             start = Zone.objects.get(id=zoneA)
