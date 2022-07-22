@@ -1,6 +1,6 @@
 from routing.models import Waypoints, Zone, Distance, Route
 
-def optimise(zones):
+def optimise(zones, distanceMatrix):
 
     routeLength = len(zones)
 
@@ -21,7 +21,7 @@ def optimise(zones):
     shortestRoute = []
     
     for route in routes:
-        distance = routeDistance(route)
+        distance = routeDistance(route, distanceMatrix)
         if (distance < shortestDistance or shortestDistance == 0):
             shortestDistance = distance
             shortestRoute = route
@@ -29,14 +29,14 @@ def optimise(zones):
     return shortestRoute
     
 
-def routeDistance(route):
+def routeDistance(route, distanceMatrix):
 
     distance = 0
     for i, zone in enumerate(route):
         if i != len(route)-1:
-            start = Zone.objects.get(id=route[i])
-            end = Zone.objects.get(id=route[i+1])
-            distance += Distance.objects.get(zone_a=start, zone_b=end).distance
+            start = route[i]
+            end = route[i+1]
+            distance = distanceMatrix[start][end]
 
     return distance
         

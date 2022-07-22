@@ -1,6 +1,6 @@
 from routing.models import Waypoints, Zone, Distance, Route
 
-def optimise(zones):
+def optimise(zones, distanceMatrix):
 
     routeLength = len(zones)
 
@@ -13,7 +13,7 @@ def optimise(zones):
     # add nearest zone to route
 
     while len(notInRoute) > 0:
-        step(route, notInRoute)
+        step(route, notInRoute, distanceMatrix)
 
     # ensure route goes back to start
     route.append(route[0])
@@ -22,16 +22,16 @@ def optimise(zones):
 
 
 
-def step(route, notInRoute):
+def step(route, notInRoute, distanceMatrix):
 
-    start = Zone.objects.get(id=route[-1])
+    start = route[-1]
 
     nearestNeighbour = None
     nearestNeighbourDistance = 0
 
     for zone in notInRoute:
-        end = Zone.objects.get(id=zone)
-        distance = Distance.objects.get(zone_a=start, zone_b=end).distance
+        end = zone
+        distance = distanceMatrix[start][end]
 
         if distance < nearestNeighbourDistance or not nearestNeighbour:
             nearestNeighbour = zone
