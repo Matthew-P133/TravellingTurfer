@@ -5,6 +5,7 @@ import requests
 import json
 from routing.models import Waypoints, Zone, Distance, Route, createRoute
 import routing.bruteForce as bruteForce
+import routing.nearestNeighbour as nearestNeighbour
 
 
 
@@ -53,18 +54,21 @@ def optimise(request):
 
     zones = json.loads(request.body)
 
-    # populate distance matrix from database
-    distanceMatrix = { zone:{} for zone in zones}
+    # ensure database has relevant distances
 
     for zoneA in zones:
         for zoneB in zones:
             start = Zone.objects.get(id=zoneA)
             end = Zone.objects.get(id=zoneB)
             distance = Distance.objects.get_or_create(zone_a=start, zone_b=end)[0].distance
-            distanceMatrix[zoneA].update({zoneB: distance})
+
 
     # calculate shortest route
-    shortestRoute = bruteForce.optimise(zones, distanceMatrix)
+
+    if len(zones) <= 7:
+        shortestRoute = bruteForce.optimise(zones)
+    else:
+        shortestRoute = nearestNeighbour.optimise(zones)
 
     # save it to the database
     route = createRoute(shortestRoute)

@@ -1,6 +1,6 @@
 from routing.models import Waypoints, Zone, Distance, Route
 
-def optimise(zones, distanceMatrix):
+def optimise(zones):
 
     routeLength = len(zones)
 
@@ -26,7 +26,6 @@ def optimise(zones, distanceMatrix):
             shortestDistance = distance
             shortestRoute = route
 
-    # save shortest route to database
     return shortestRoute
     
 
@@ -54,7 +53,7 @@ def findAllRoutes(route, notInRoute, routes):
         for zone in notInRoute:
             newRoute = route.copy()
             newRoute.append(zone)
-            
+
             newNotInRoute = notInRoute.copy()
             newNotInRoute.remove(zone)
             findAllRoutes(newRoute, newNotInRoute, routes)
