@@ -6,6 +6,7 @@ import json
 from routing.models import Waypoints, Zone, Distance, Route, createRoute
 import routing.bruteForce as bruteForce
 import routing.nearestNeighbour as nearestNeighbour
+import routing.christofides as christofides
 import time
 
 
@@ -68,10 +69,10 @@ def optimise(request):
     # calculate shortest route
 
     if len(zones) <= 7:
-        shortestRoute = bruteForce.optimise(zones, distanceMatrix)
+        shortestRoute = christofides.optimise(zones, distanceMatrix)
     else:
         
-        shortestRoute = nearestNeighbour.optimise(zones, distanceMatrix)
+        shortestRoute = christofides.optimise(zones, distanceMatrix)
 
 
     # save it to the database
