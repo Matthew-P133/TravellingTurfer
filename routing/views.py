@@ -7,6 +7,8 @@ from routing.models import Waypoints, Zone, Distance, Route, createRoute
 import routing.bruteForce as bruteForce
 import routing.nearestNeighbour as nearestNeighbour
 import routing.christofides as christofides
+import routing.twoOpt as twoOpt
+import routing.routing_utils as routing_utils
 import time
 
 
@@ -70,9 +72,41 @@ def optimise(request):
 
     if len(zones) <= 7:
         shortestRoute = bruteForce.optimise(zones, distanceMatrix)
-    else:
-        shortestRoute = christofides.optimise(zones, distanceMatrix)
+    elif len(zones) <= 55:
 
+        #start = time.time()
+        shortestRoute = christofides.optimise(zones, distanceMatrix)
+        #print(f"{time.time()- start} + seconds")
+
+        distance = routing_utils.distance(shortestRoute, distanceMatrix)
+        #print(shortestRoute)
+        #print(distance)
+
+        start = time.time()
+        shortestRoute = twoOpt.optimise(shortestRoute, distanceMatrix)
+        #print(f"{time.time()- start} + seconds")
+
+        distance = routing_utils.distance(shortestRoute, distanceMatrix)
+        #print(shortestRoute)
+        #print(distance)
+
+    else:
+
+        #start = time.time()
+        shortestRoute = nearestNeighbour.optimise(zones, distanceMatrix)
+        #print(f"{time.time()- start} + seconds")
+
+        distance = routing_utils.distance(shortestRoute, distanceMatrix)
+        #print(shortestRoute)
+        #print(distance)
+
+        #start = time.time()
+        shortestRoute = twoOpt.optimise(shortestRoute, distanceMatrix)
+        #print(f"{time.time()- start} + seconds")
+
+        distance = routing_utils.distance(shortestRoute, distanceMatrix)
+        #print(shortestRoute)
+        #print(distance)
 
     # save it to the database
     route = createRoute(shortestRoute)
