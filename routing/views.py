@@ -69,9 +69,8 @@ def optimise(request):
     # calculate shortest route
 
     if len(zones) <= 7:
-        shortestRoute = christofides.optimise(zones, distanceMatrix)
+        shortestRoute = bruteForce.optimise(zones, distanceMatrix)
     else:
-        
         shortestRoute = christofides.optimise(zones, distanceMatrix)
 
 
