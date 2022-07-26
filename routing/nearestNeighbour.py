@@ -2,9 +2,6 @@ from routing.models import Waypoints, Zone, Distance, Route
 
 def optimise(zones, distanceMatrix):
 
-    print(zones)
-    print(distanceMatrix)
-
     routeLength = len(zones)
 
     # add first zone to route

@@ -8,6 +8,7 @@ import routing.bruteForce as bruteForce
 import routing.nearestNeighbour as nearestNeighbour
 import routing.christofides as christofides
 import routing.twoOpt as twoOpt
+import routing.threeOpt as threeOpt
 import routing.routing_utils as routing_utils
 import time
 
@@ -59,7 +60,7 @@ def optimise(request):
     zones = json.loads(request.body)
 
     # populate distance matrix from database
-    distanceMatrix = { zone:{} for zone in zones}
+    distanceMatrix = {zone:{} for zone in zones}
 
     for zoneA in zones:
         for zoneB in zones:
@@ -68,45 +69,31 @@ def optimise(request):
             distance = Distance.objects.get_or_create(zone_a=start, zone_b=end)[0].distance
             distanceMatrix[zoneA].update({zoneB: distance})
 
-    # calculate shortest route
-
+    # main algorithm
+    start = time.time()
     if len(zones) <= 7:
+        print("Using bruteforce algorithm...")
         shortestRoute = bruteForce.optimise(zones, distanceMatrix)
     elif len(zones) <= 55:
-
-        #start = time.time()
+        print("Using Christofide's algorithm...")
         shortestRoute = christofides.optimise(zones, distanceMatrix)
-        #print(f"{time.time()- start} + seconds")
-
-        distance = routing_utils.distance(shortestRoute, distanceMatrix)
-        #print(shortestRoute)
-        #print(distance)
-
-        start = time.time()
-        shortestRoute = twoOpt.optimise(shortestRoute, distanceMatrix)
-        #print(f"{time.time()- start} + seconds")
-
-        distance = routing_utils.distance(shortestRoute, distanceMatrix)
-        #print(shortestRoute)
-        #print(distance)
-
     else:
-
-        #start = time.time()
+        print("Using nearest neighbour algorithm...")
         shortestRoute = nearestNeighbour.optimise(zones, distanceMatrix)
-        #print(f"{time.time()- start} + seconds")
 
-        distance = routing_utils.distance(shortestRoute, distanceMatrix)
-        #print(shortestRoute)
-        #print(distance)
+    print(f"{routing_utils.distance(shortestRoute, distanceMatrix)} km route found in {time.time() - start} seconds")
 
-        #start = time.time()
-        shortestRoute = twoOpt.optimise(shortestRoute, distanceMatrix)
-        #print(f"{time.time()- start} + seconds")
+    # extra heuristics
 
-        distance = routing_utils.distance(shortestRoute, distanceMatrix)
-        #print(shortestRoute)
-        #print(distance)
+    print('Optimising with 2-opt...')
+    start = time.time()
+    shortestRoute = twoOpt.optimise(shortestRoute, distanceMatrix)
+    print(f"Optimised to {routing_utils.distance(shortestRoute, distanceMatrix)} km route in {time.time() - start} seconds")
+
+    print('Optimising with 3-opt...')
+    start = time.time()
+    shortestRoute = threeOpt.optimise(shortestRoute, distanceMatrix)
+    print(f"Optimised to {routing_utils.distance(shortestRoute, distanceMatrix)} km route in {time.time() - start} seconds")
 
     # save it to the database
     route = createRoute(shortestRoute)

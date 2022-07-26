@@ -127,6 +127,7 @@ class Distance(models.Model):
         self.distance = distance
 
         super().save(*args, **kwargs)
+
         
 
 # helper method to calculate straight line distance between two zones
