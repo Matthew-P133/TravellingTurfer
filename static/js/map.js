@@ -162,6 +162,46 @@ window.onload = function () {
         .then(response => window.location.replace("http://127.0.0.1:8000/route" + response));
 
     }
+
+    document.getElementById('selectVisible').addEventListener('click', selectVisible);
+    document.getElementById('deselectVisible').addEventListener('click', deselectVisible);
+    document.getElementById('deselectAll').addEventListener('click', deselectAll);
+
+    function selectVisible() {
+        // select all visible unselected markers
+        markerGroup.eachLayer(function (layer) {
+            console.log(layer.options)
+            layer.setStyle({ color: '#ff0000' });
+            markerGroup.removeLayer(layer);
+            selectedMarkerGroup.addLayer(layer);
+        });
+            updateStats();
+    };
+
+    function deselectVisible() {
+        // deselect visible selected markers
+        selectedMarkerGroup.eachLayer(function (layer) {
+            if (map.getBounds().contains(layer.getLatLng())) {
+                layer.setStyle({ color: '#3388ff' });
+                selectedMarkerGroup.removeLayer(layer);
+                markerGroup.addLayer(layer);
+            }
+        });
+            updateStats();
+    };
+
+
+    function deselectAll() {
+        // deselect visible selected markers
+        selectedMarkerGroup.eachLayer(function (layer) {
+            layer.setStyle({ color: '#3388ff' });
+            selectedMarkerGroup.removeLayer(layer);
+            markerGroup.addLayer(layer);
+        });
+            updateStats();
+    };
+
+
 };
 
 
