@@ -84,16 +84,19 @@ def optimise(request):
     print(f"{routing_utils.distance(shortestRoute, distanceMatrix)} km route found in {time.time() - start} seconds")
 
     # extra heuristics
+    if len(zones) > 7:
 
-    print('Optimising with 2-opt...')
-    start = time.time()
-    shortestRoute = twoOpt.optimise(shortestRoute, distanceMatrix)
-    print(f"Optimised to {routing_utils.distance(shortestRoute, distanceMatrix)} km route in {time.time() - start} seconds")
+        print('Optimising with 2-opt...')
+        start = time.time()
+        shortestRoute = twoOpt.optimise(shortestRoute, distanceMatrix)
+        print(f"Optimised to {routing_utils.distance(shortestRoute, distanceMatrix)} km route in {time.time() - start} seconds")
 
-    print('Optimising with 3-opt...')
-    start = time.time()
-    shortestRoute = threeOpt.optimise(shortestRoute, distanceMatrix)
-    print(f"Optimised to {routing_utils.distance(shortestRoute, distanceMatrix)} km route in {time.time() - start} seconds")
+        if len(zones) < 75:
+
+            print('Optimising with 3-opt...')
+            start = time.time()
+            shortestRoute = threeOpt.optimise(shortestRoute, distanceMatrix)
+            print(f"Optimised to {routing_utils.distance(shortestRoute, distanceMatrix)} km route in {time.time() - start} seconds")
 
     # save it to the database
     route = createRoute(shortestRoute)

@@ -115,8 +115,8 @@ class Distance(models.Model):
                 coordinates = []
             else:
                 geoJSON = route(start, end)
-                distance = geoJSON['features'][0]['properties']['summary']['distance']
-                coordinates = geoJSON['features'][0]['geometry']['coordinates']
+                distance = geoJSON['paths'][0]['distance'] / 1000
+                coordinates = geoJSON['paths'][0]['points']['coordinates']
 
         geoJSON = {
             'type': 'LineString',
@@ -141,9 +141,14 @@ def straightLineDistance(start, end):
 # helper method to get snap to road route from OpenRouteService
 def route(start, end):
 
-    
-    api_key=os.getenv('api_key')
-    response = requests.get(f"https://api.openrouteservice.org/v2/directions/foot-walking?api_key={api_key}&start={start.longitude},{start.latitude}&end={end.longitude},{end.latitude}")
+    # openrouteservice
+    #api_key=os.getenv('api_key')
+    #response = requests.get(f"https://api.openrouteservice.org/v2/directions/foot-walking?api_key={api_key}&start={start.longitude},{start.latitude}&end={end.longitude},{end.latitude}")
+
+    # locally hosted graph hopper instance
+    response = requests.post('http://localhost:8989/route', 
+                            data = json.dumps({"points": [[start.longitude, start.latitude], [end.longitude, end.latitude]],'points_encoded':False}), headers = {'Accept': 'application/json',
+                            'Content-Type': 'application/json',})
 
     return json.loads(response.content)
 
