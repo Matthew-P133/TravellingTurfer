@@ -109,14 +109,13 @@ class Distance(models.Model):
             coordinates = [[zone.longitude, zone.latitude] for zone in [self.zone_a, self.zone_b]]
         
         else:
-
             if start.id == end.id:
                 distance = 0
                 coordinates = []
             else:
-                geoJSON = route(start, end)
-                distance = geoJSON['paths'][0]['distance'] / 1000
-                coordinates = geoJSON['paths'][0]['points']['coordinates']
+                routeData = route(start, end)
+                distance = routeData['distance']
+                coordinates = routeData['coordinates']
 
         geoJSON = {
             'type': 'LineString',
@@ -129,7 +128,6 @@ class Distance(models.Model):
         super().save(*args, **kwargs)
 
         
-
 # helper method to calculate straight line distance between two zones
 def straightLineDistance(start, end):
 
@@ -138,17 +136,28 @@ def straightLineDistance(start, end):
     straightLineDistance = distance.distance(startCoord, endCoord).km
     return straightLineDistance
 
-# helper method to get snap to road route from OpenRouteService
+# helper method to get snap to road route
 def route(start, end):
 
-    # openrouteservice
-    #api_key=os.getenv('api_key')
-    #response = requests.get(f"https://api.openrouteservice.org/v2/directions/foot-walking?api_key={api_key}&start={start.longitude},{start.latitude}&end={end.longitude},{end.latitude}")
+    routeData = {}
 
-    # locally hosted graph hopper instance
-    response = requests.post('http://localhost:8989/route', 
+    # get A->B route from locally hosted graph hopper instance
+    response = json.loads(requests.post('http://localhost:8989/route', 
                             data = json.dumps({"points": [[start.longitude, start.latitude], [end.longitude, end.latitude]],'points_encoded':False}), headers = {'Accept': 'application/json',
-                            'Content-Type': 'application/json',})
+                            'Content-Type': 'application/json',}))
 
-    return json.loads(response.content)
+    routeData['distance'] = response['paths'][0]['distance'] / 1000
+    routeData['coordinates'] = response['paths'][0]['points']['coordinates']
+    return routeData
+
+# helper method to generate distance matrix of A->B distances
+def generateDistanceMatrix(zones):
+    distanceMatrix = {zone:{} for zone in zones}
+    for zoneA in zones:
+        for zoneB in zones:
+            start = Zone.objects.get(id=zoneA)
+            end = Zone.objects.get(id=zoneB)
+            distance = Distance.objects.get_or_create(zone_a=start, zone_b=end)[0].distance
+            distanceMatrix[zoneA].update({zoneB: distance})
+    return distanceMatrix
 
