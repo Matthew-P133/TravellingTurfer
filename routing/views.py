@@ -74,7 +74,7 @@ def optimise(request):
     if len(zones) <= 7:
         print("Using bruteforce algorithm...")
         shortestRoute = bruteForce.optimise(zones, distanceMatrix)
-    elif len(zones) <= 55:
+    elif len(zones) <= 40:
         print("Using Christofide's algorithm...")
         shortestRoute = christofides.optimise(zones, distanceMatrix)
     else:
