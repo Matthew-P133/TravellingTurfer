@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseNotAllowed, HttpResponseBadRequest
 from django.urls import reverse
 import requests
 import json
@@ -51,51 +51,81 @@ def zones(request):
 
 def optimise(request):
 
-    zones = json.loads(request.body)
+    if request.method == 'POST':
 
-    # populate distance matrix from database
-    distanceMatrix = generateDistanceMatrix(zones)
+        # check request data
+        try:
+            zones = json.loads(request.body)
+        except:
+            return HttpResponseBadRequest()
+
+        if not all(isinstance(zone, int) for zone in zones):
+            return HttpResponseBadRequest()
+
+        if len(zones) > 100:
+            return HttpResponseBadRequest()
+
+        # populate distance matrix from database
+        distanceMatrix = generateDistanceMatrix(zones)
     
-    # main algorithm
-    start = time.time()
-    if len(zones) <= 7:
-        print("Using bruteforce algorithm...")
-        shortestRoute = bruteForce.optimise(zones, distanceMatrix)
-    elif len(zones) <= 40:
-        print("Using Christofide's algorithm...")
-        shortestRoute = christofides.optimise(zones, distanceMatrix)
-    else:
-        print("Using nearest neighbour algorithm...")
-        shortestRoute = nearestNeighbour.optimise(zones, distanceMatrix)
-
-    print(f"{routing_utils.distance(shortestRoute, distanceMatrix)} km route found in {time.time() - start} seconds")
-
-    # extra heuristics
-    if len(zones) > 7:
-
-        print('Optimising with 2-opt...')
+        # main algorithm
         start = time.time()
-        shortestRoute = twoOpt.optimise(shortestRoute, distanceMatrix)
-        print(f"Optimised to {routing_utils.distance(shortestRoute, distanceMatrix)} km route in {time.time() - start} seconds")
+        if len(zones) <= 7:
+            print("Using bruteforce algorithm...")
+            shortestRoute = bruteForce.optimise(zones, distanceMatrix)
+        elif len(zones) <= 40:
+            print("Using Christofide's algorithm...")
+            shortestRoute = christofides.optimise(zones, distanceMatrix)
+        else:
+            print("Using nearest neighbour algorithm...")
+            shortestRoute = nearestNeighbour.optimise(zones, distanceMatrix)
 
-        if len(zones) < 75:
+        print(f"{routing_utils.distance(shortestRoute, distanceMatrix)} km route found in {time.time() - start} seconds")
 
-            print('Optimising with 3-opt...')
+        # extra heuristics
+        if len(zones) > 7:
+
+            print('Optimising with 2-opt...')
             start = time.time()
-            shortestRoute = threeOpt.optimise(shortestRoute, distanceMatrix)
+            shortestRoute = twoOpt.optimise(shortestRoute, distanceMatrix)
             print(f"Optimised to {routing_utils.distance(shortestRoute, distanceMatrix)} km route in {time.time() - start} seconds")
 
-    # save route to the database
-    route = createRoute(shortestRoute)
+            if len(zones) < 75:
 
-    # returns route id of newly created route; javascript redirects user to route page
-    return HttpResponse(route.id)
+                print('Optimising with 3-opt...')
+                start = time.time()
+                shortestRoute = threeOpt.optimise(shortestRoute, distanceMatrix)
+                print(f"Optimised to {routing_utils.distance(shortestRoute, distanceMatrix)} km route in {time.time() - start} seconds")
+
+        # save route to the database
+        route = createRoute(shortestRoute)
+
+        # returns route id of newly created route; javascript redirects user to route page
+        return HttpResponse(route.id)
+    else:
+        return HttpResponseNotAllowed(permitted_methods=['POST'])
 
 
 # generates geoJSON for display of a given route
 def generate(request):
-    id = json.loads(request.body)['id']
-    geoJSON = Route.objects.get(id=id).getGeoJSON()
-    return JsonResponse(geoJSON)
+    if request.method == 'POST':
 
+
+        # check request data
+        try:
+            id = json.loads(request.body)
+        except:
+            return HttpResponseBadRequest()
+
+        if not len(id) == 1 or not isinstance(id[0], int):
+            return HttpResponseBadRequest()
+
+        try:
+            geoJSON = Route.objects.get(id=id[0]).getGeoJSON()
+            return JsonResponse(geoJSON)
+        except:
+            return HttpResponseBadRequest()
+
+    else:
+        return HttpResponseNotAllowed(permitted_methods=['POST'])
 

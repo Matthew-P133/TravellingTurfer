@@ -144,10 +144,11 @@ def route(start, end):
     # get A->B route from locally hosted graph hopper instance
     response = json.loads(requests.post('http://localhost:8989/route', 
                             data = json.dumps({"points": [[start.longitude, start.latitude], [end.longitude, end.latitude]],'points_encoded':False}), headers = {'Accept': 'application/json',
-                            'Content-Type': 'application/json',}))
+                            'Content-Type': 'application/json',}).content)
 
     routeData['distance'] = response['paths'][0]['distance'] / 1000
     routeData['coordinates'] = response['paths'][0]['points']['coordinates']
+
     return routeData
 
 # helper method to generate distance matrix of A->B distances

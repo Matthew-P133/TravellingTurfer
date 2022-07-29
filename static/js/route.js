@@ -9,7 +9,7 @@ window.onload = function () {
     }).addTo(map);
 
     // add route to map
-    id = document.getElementById('id').innerHTML;
+    id = parseInt(document.getElementById('id').innerHTML);
     loadRoute(id);
 
     
@@ -22,9 +22,7 @@ window.onload = function () {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': getCookie('csrftoken')
             },
-            body: JSON.stringify({
-                'id':id
-            }),
+            body: JSON.stringify([id]),
             credentials: 'same-origin',
         })
             .then(response => response.json())
