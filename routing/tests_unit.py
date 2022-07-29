@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
-from routing.models import Zone, Waypoints
+from routing.models import Zone, Waypoints, generateDistanceMatrix, straightLineDistance, Route
 import random
 import json
 
@@ -22,7 +22,6 @@ class MapViewTest(TestCase):
         response = self.client.get(reverse("routing:map"))
         self.assertTemplateUsed(response, 'routing/map.html')
 
-
 class RoutingViewTest(TestCase):
 
     def test_url_exists(self):
@@ -37,7 +36,6 @@ class RoutingViewTest(TestCase):
         response = self.client.get('/route437/')
         self.assertEqual(response.context['id'], 437)
  
-
 class ZoneAPITest(TestCase):
 
     def setUp(self):
@@ -138,7 +136,6 @@ class OptimiseTest(TestCase):
             self.assertEqual(waypoint.position, i)
             self.assertEqual(waypoint.zone_id, correctOrder[i])
 
-
 # tests the /generate/ endpoint
 class GenerateTest(TestCase):
 
@@ -175,3 +172,40 @@ class GenerateTest(TestCase):
         payload = json.dumps([100])
         response = self.client.post('/generate/', payload, content_type='application/json')
         self.assertEquals(response.status_code, 400)
+
+class ModelsTest(TestCase):
+
+    fixtures = ['testZones.json', 'testDistances.json', 'testRoutes.json', 'testWaypoints.json']
+
+    def test_generate_distance_matrix(self):
+        zones = [15341, 15346, 15379, 15380]
+        distanceMatrix = generateDistanceMatrix(zones)
+        # check all zones are in matrix as 'A's
+        self.assertTrue(all(zone in distanceMatrix for zone in zones))
+        # check all zones are in matrix as 'B's
+        for start in distanceMatrix:
+            self.assertTrue(all(zone in distanceMatrix[start] for zone in zones))
+        # check all diagonal elements are 0
+        self.assertTrue(all(distanceMatrix[zone][zone] == 0 for zone in zones))
+        # check all non-diagonal elements are non-zero
+        self.assertTrue(all((distanceMatrix[x][y] > 0 for x in zones for y in zones if x != y)))
+        # check all keys are from zones
+        self.assertTrue(all((start in zones and all(end in zones for end in distanceMatrix[start]) for start in distanceMatrix)))
+
+    def test_straight_line_distance(self):
+        start = Zone.objects.get(id=15341)
+        end = Zone.objects.get(id=15346)
+        self.assertEquals(straightLineDistance(start, end), 0.8963265053632578)
+
+    def test_route_get_distance(self):
+        route = Route.objects.get(id=215)
+        self.assertEqual(route.getDistance(), 12.886106000000002)
+
+    def test_route_get_geojson(self):
+        route = Route.objects.get(id=215)
+        geoJSON = route.getGeoJSON()
+        self.assertTrue(len(geoJSON) == 2)
+        self.assertTrue('type' in geoJSON)
+        self.assertTrue('coordinates' in geoJSON)
+        self.assertTrue(geoJSON['coordinates'] is not None)
+        self.assertEquals(len(geoJSON['coordinates']), 353)
