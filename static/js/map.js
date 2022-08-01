@@ -2,11 +2,20 @@ window.onload = function () {
 
     // display map when page is fully loaded
     var map = L.map('map').setView([56, -4], 11);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    normalMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '© OpenStreetMap',
         preferCanvas: true,
-    }).addTo(map);
+    });
+
+    satelliteMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        maxZoom: 19,
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+        preferCanvas: true,
+    });
+
+    normalMap.addTo(map);
+
 
     markerGroup = L.layerGroup().addTo(map);
     selectedMarkerGroup = L.layerGroup().addTo(map);
@@ -142,6 +151,7 @@ window.onload = function () {
     }
 
     document.getElementById('createRoute').addEventListener('click', createRoute);
+    document.getElementById('toggleMap').addEventListener('click', toggleMap)
 
     function createRoute() {
 
@@ -201,6 +211,17 @@ window.onload = function () {
     };
 
 
+
+    function toggleMap() {
+        if (map.hasLayer(normalMap)) {
+            map.removeLayer(normalMap)
+            satelliteMap.addTo(map);
+        }
+         else if (map.hasLayer(satelliteMap)) {
+            map.removeLayer(satelliteMap)
+            normalMap.addTo(map);
+        }
+    }
 };
 
 
