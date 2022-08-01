@@ -129,7 +129,7 @@ def generate(request):
 
             for zone in zones:
                 zone['position'] = waypointsDict[zone['id']]
-                
+
             response = {'geoJSON': geoJSON, 'zones': list(zones)}
             return JsonResponse(response)
         except:

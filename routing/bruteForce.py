@@ -25,9 +25,7 @@ def optimise(zones, distanceMatrix):
         if (distance < shortestDistance or shortestDistance == 0):
             shortestDistance = distance
             shortestRoute = route
-
     return shortestRoute
-    
 
 def routeDistance(route, distanceMatrix):
 
@@ -36,7 +34,7 @@ def routeDistance(route, distanceMatrix):
         if i != len(route)-1:
             start = route[i]
             end = route[i+1]
-            distance = distanceMatrix[start][end]
+            distance += distanceMatrix[start][end]
 
     return distance
         
