@@ -161,7 +161,8 @@ class GenerateTest(TestCase):
         payload = json.dumps([215])
         response = self.client.post('/generate/', payload, content_type='application/json')
         self.assertEquals(response.status_code, 200)
-        geoJSON = json.loads(response.content)
+        response_data = json.loads(response.content)
+        geoJSON = response_data['geoJSON']
         self.assertTrue(len(geoJSON) == 2)
         self.assertTrue('type' in geoJSON)
         self.assertTrue('coordinates' in geoJSON)
