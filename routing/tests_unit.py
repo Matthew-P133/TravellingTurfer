@@ -1,8 +1,10 @@
-from django.test import TestCase
+from django.test import TestCase, TransactionTestCase
 from django.urls import reverse
-from routing.models import Zone, Waypoints, generateDistanceMatrix, straightLineDistance, Route
+from routing.models import Zone, Waypoints, Job, generateDistanceMatrix, straightLineDistance, Route
 import random
 import json
+from routing.tests_functional import TIMEOUT, wait_helper
+import time
 
 class MapViewTest(TestCase):
 
@@ -66,7 +68,7 @@ class ZoneAPITest(TestCase):
         self.assertNotContains(response, 'Geijers')
         self.assertContains(response, "Area requested is too large")
 
-class OptimiseTest(TestCase):
+class OptimiseTest(TransactionTestCase):
 
     # populate test database with test zones and distances
     fixtures = ['testZones.json', 'testDistances.json']
@@ -101,12 +103,16 @@ class OptimiseTest(TestCase):
         self.assertEquals(response.status_code, 200)
         # get waypoints of route from database and check in expected order
         id = json.loads(response.content)
-        waypoints = Waypoints.objects.filter(route_id=id)
-        self.assertEqual(len(waypoints), len(json.loads(payload))+1)
-        correctOrder = [16006, 16975, 173258, 15378, 16006]
-        for i, waypoint in enumerate(waypoints):
-            self.assertEqual(waypoint.position, i)
-            self.assertEqual(waypoint.zone_id, correctOrder[i])
+
+        def test():
+            waypoints = Waypoints.objects.filter(route_id=id)
+            self.assertEqual(len(waypoints), len(json.loads(payload))+1)
+            correctOrder = [16006, 16975, 173258, 15378, 16006]
+            for i, waypoint in enumerate(waypoints):
+                self.assertEqual(waypoint.position, i)
+                self.assertEqual(waypoint.zone_id, correctOrder[i])
+
+        wait_helper(test)
 
     def test_christofides_algorithm(self):
         # make request and test 200 status code
@@ -115,12 +121,16 @@ class OptimiseTest(TestCase):
         self.assertEquals(response.status_code, 200)
         # get waypoints of route from database and check in expected order
         id = json.loads(response.content)
-        waypoints = Waypoints.objects.filter(route_id=id)
-        self.assertEqual(len(waypoints), len(json.loads(payload))+1)
-        correctOrder = [16065, 15447, 173254, 15396, 15448, 16064, 16066, 16068, 16069, 16067, 15457, 15378, 15713, 476525, 15459, 15458, 173257, 15380, 173256, 173255, 15379, 476496, 15714, 476494, 15460, 16075, 16073, 15454, 15446, 16065]
-        for i, waypoint in enumerate(waypoints):
-            self.assertEqual(waypoint.position, i)
-            self.assertEqual(waypoint.zone_id, correctOrder[i])
+
+        def test():
+            waypoints = Waypoints.objects.filter(route_id=id)
+            self.assertEqual(len(waypoints), len(json.loads(payload))+1)
+            correctOrder = [16065, 15447, 173254, 15396, 15448, 16064, 16066, 16068, 16069, 16067, 15457, 15378, 15713, 476525, 15459, 15458, 173257, 15380, 173256, 173255, 15379, 476496, 15714, 476494, 15460, 16075, 16073, 15454, 15446, 16065]
+            for i, waypoint in enumerate(waypoints):
+                self.assertEqual(waypoint.position, i)
+                self.assertEqual(waypoint.zone_id, correctOrder[i])
+        
+        wait_helper(test)
 
     def test_nearest_neighbour_algorithm(self):
         # make request and test 200 status code
@@ -129,12 +139,17 @@ class OptimiseTest(TestCase):
         self.assertEquals(response.status_code, 200)
         # get waypoints of route from database and check in expected order
         id = json.loads(response.content)
-        waypoints = Waypoints.objects.filter(route_id=id)
-        self.assertEqual(len(waypoints), len(json.loads(payload))+1)
-        correctOrder = [15380, 173256, 15446, 173254, 15448, 15447, 173255, 15379, 15378, 16065, 16064, 16066, 16068, 16069, 15455, 411367, 496582, 16067, 15457, 476496, 15713, 15458, 15459, 476525, 15460, 476494, 476495, 411354, 411351, 411353, 328273, 15714, 15396, 15453, 15399, 323827, 15452, 346792, 16004, 15451, 16005, 173259, 516844, 15380]
-        for i, waypoint in enumerate(waypoints):
-            self.assertEqual(waypoint.position, i)
-            self.assertEqual(waypoint.zone_id, correctOrder[i])
+        
+        def test():
+            
+            waypoints = Waypoints.objects.filter(route_id=id)
+            self.assertEqual(len(waypoints), len(json.loads(payload))+1)
+            correctOrder = [15380, 173256, 15446, 173254, 15448, 15447, 173255, 15379, 15378, 16065, 16064, 16066, 16068, 16069, 15455, 411367, 496582, 16067, 15457, 476496, 15713, 15458, 15459, 476525, 15460, 476494, 476495, 411354, 411351, 411353, 328273, 15714, 15396, 15453, 15399, 323827, 15452, 346792, 16004, 15451, 16005, 173259, 516844, 15380]
+            for i, waypoint in enumerate(waypoints):
+                self.assertEqual(waypoint.position, i)
+                self.assertEqual(waypoint.zone_id, correctOrder[i])
+
+        wait_helper(test)
 
 # tests the /generate/ endpoint
 class GenerateTest(TestCase):
@@ -179,8 +194,9 @@ class ModelsTest(TestCase):
     fixtures = ['testZones.json', 'testDistances.json', 'testRoutes.json', 'testWaypoints.json']
 
     def test_generate_distance_matrix(self):
+        job = Job(route=Route.objects.get(id=215))
         zones = [15341, 15346, 15379, 15380]
-        distanceMatrix = generateDistanceMatrix(zones)
+        distanceMatrix = generateDistanceMatrix(zones, job)
         # check all zones are in matrix as 'A's
         self.assertTrue(all(zone in distanceMatrix for zone in zones))
         # check all zones are in matrix as 'B's

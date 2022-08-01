@@ -9,7 +9,7 @@ import time
 # install geckodriver if not installed and add it to path
 geckodriver_autoinstaller.install()
 
-TIMEOUT = 5
+TIMEOUT = 15
 
 # smart wait for testing anything asynchronous
 def wait_helper(fn):
@@ -43,9 +43,7 @@ class FunctionalTestsDB(StaticLiveServerTestCase):
         # check that map loads
         wait_helper(lambda: self.assertIsNot("", self.browser.execute_script('return document.getElementById(\'map\').innerHtml;')))
 
-        # zoom map and check that zones displayed
-
-        self.browser.find_element('css selector', '.leaflet-control-zoom-in').click()
+        #check that zones displayed
         wait_helper(lambda: self.assertGreater(self.browser.execute_script('zoneCount = 0; markerGroup.eachLayer(zone => zoneCount++); return zoneCount;'), 0))
 
         # click on zones and check that stats are updated

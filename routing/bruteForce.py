@@ -12,7 +12,7 @@ def optimise(zones, distanceMatrix):
 
     # zones still to be visited
     notInRoute = [zones[i] for i in range(1,routeLength)]
-
+    
     # brute force generate all routes
     findAllRoutes(route, notInRoute, routes)
 
@@ -25,6 +25,7 @@ def optimise(zones, distanceMatrix):
         if (distance < shortestDistance or shortestDistance == 0):
             shortestDistance = distance
             shortestRoute = route
+
     return shortestRoute
 
 def routeDistance(route, distanceMatrix):

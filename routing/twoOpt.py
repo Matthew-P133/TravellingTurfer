@@ -1,6 +1,6 @@
 import routing.routing_utils as routing_utils
 
-def optimise(route, distanceMatrix):
+def optimise(route, distanceMatrix, job):
     distance = routing_utils.distance(route, distanceMatrix)
     while True:
         optimised = True
@@ -13,6 +13,8 @@ def optimise(route, distanceMatrix):
                         route[j] = temp
                         if routing_utils.distance(route, distanceMatrix) < distance:
                             distance = routing_utils.distance(route, distanceMatrix)
+                            job.shortest = distance
+                            job.save()
                             optimised = False
                             break
                         temp = route[i]

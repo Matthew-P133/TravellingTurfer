@@ -3,7 +3,7 @@ from django.http import HttpResponse, JsonResponse, HttpResponseNotAllowed, Http
 from django.urls import reverse
 import requests
 import json
-from routing.models import Waypoints, Zone, Distance, Route, createRoute, generateDistanceMatrix
+from routing.models import Waypoints, Zone, Distance, Route, Job, createRoute, generateDistanceMatrix
 import routing.bruteForce as bruteForce
 import routing.nearestNeighbour as nearestNeighbour
 import routing.christofides as christofides
@@ -11,6 +11,7 @@ import routing.twoOpt as twoOpt
 import routing.threeOpt as threeOpt
 import routing.routing_utils as routing_utils
 import time
+import threading
 
 
 
@@ -58,53 +59,93 @@ def optimise(request):
             zones = json.loads(request.body)
         except:
             return HttpResponseBadRequest()
-
         if not all(isinstance(zone, int) for zone in zones):
             return HttpResponseBadRequest()
-
         if len(zones) > 100:
             return HttpResponseBadRequest()
 
+        route = Route()
+        route.save()
+        job = Job(route=route)
+        job.save()
+
+        # start route optimisation job in a new thread and return route id to client
+        t = threading.Thread(target=optimisation_job, args=[route, zones, job])
+        t.setDaemon(False)
+        t.start()   
+
+        # returns route id of newly created route; javascript redirects user to route page
+        return HttpResponse(route.id)
+
+    else:
+        return HttpResponseNotAllowed(permitted_methods=['POST'])
+
+def status(request):
+    id = json.loads(request.body)[0]
+    job = Job.objects.get(route=Route.objects.get(id=id))
+    response = {'status': job.status, 'message': job.message, 'shortest': job.shortest}
+
+    return JsonResponse(response)
+
+def optimisation_job(route, zones, job):
+
+        job.message = f"Generating distance matrix (0 of {len(zones)*len(zones)}"
+        job.save()
+
         # populate distance matrix from database
-        distanceMatrix = generateDistanceMatrix(zones)
+        start = time.time()
+        distanceMatrix = generateDistanceMatrix(zones, job)
+        end = time.time()
+        job.distance_matrix_generation_ms = end - start
+        job.save()
     
         # main algorithm
         start = time.time()
         if len(zones) <= 7:
-            print("Using bruteforce algorithm...")
+            job.method = "bruteforce"
+            job.save()
             shortestRoute = bruteForce.optimise(zones, distanceMatrix)
         elif len(zones) <= 40:
-            print("Using Christofide's algorithm...")
-            shortestRoute = christofides.optimise(zones, distanceMatrix)
+            job.method = "Christofide's"
+            job.save()
+            shortestRoute = christofides.optimise(zones, distanceMatrix, job)
         else:
-            print("Using nearest neighbour algorithm...")
+            job.method = "nearest neighbour"
+            job.save()
             shortestRoute = nearestNeighbour.optimise(zones, distanceMatrix)
-
-        print(f"{routing_utils.distance(shortestRoute, distanceMatrix)} km route found in {time.time() - start} seconds")
-
+        end = time.time()
+        job.base_distance = routing_utils.distance(shortestRoute, distanceMatrix)
+        job.base_algorithm_ms = end - start
+        job.save()
+        
         # extra heuristics
         if len(zones) > 7:
-
-            print('Optimising with 2-opt...')
+            job.message = "Optimising with 2-opt"
+            job.two_opt = True
+            job.save()
             start = time.time()
-            shortestRoute = twoOpt.optimise(shortestRoute, distanceMatrix)
-            print(f"Optimised to {routing_utils.distance(shortestRoute, distanceMatrix)} km route in {time.time() - start} seconds")
+            shortestRoute = twoOpt.optimise(shortestRoute, distanceMatrix, job)
+            end = time.time()
+            job.two_opt_improvement = job.base_distance - job.shortest
+            job.two_opt_ms = end - start
+            job.save()
 
             if len(zones) < 75:
-
-                print('Optimising with 3-opt...')
+                job.message = "Optimising with 3-opt"
+                job.three_opt = True
+                job.save()
                 start = time.time()
-                shortestRoute = threeOpt.optimise(shortestRoute, distanceMatrix)
-                print(f"Optimised to {routing_utils.distance(shortestRoute, distanceMatrix)} km route in {time.time() - start} seconds")
+                shortestRoute = threeOpt.optimise(shortestRoute, distanceMatrix, job)
+                end = time.time()
+                job.three_opt_improvement = job.base_distance - job.two_opt_improvement - job.shortest
+                job.three_opt_ms = end - start
+                job.save()
 
         # save route to the database
-        route = createRoute(shortestRoute)
-
-        # returns route id of newly created route; javascript redirects user to route page
-        return HttpResponse(route.id)
-    else:
-        return HttpResponseNotAllowed(permitted_methods=['POST'])
-
+        route = createRoute(route, shortestRoute)
+        job.message = "Optimisation completed"
+        job.status = True
+        job.save()
 
 # generates geoJSON for display of a given route
 def generate(request):

@@ -65,9 +65,8 @@ class Route(models.Model):
 
         return geoJSON
 
-def createRoute(zones):
+def createRoute(route, zones):
 
-    route = Route()
     waypoints = []
 
     for position, zone in enumerate(zones):
@@ -126,6 +125,25 @@ class Distance(models.Model):
 
         super().save(*args, **kwargs)
 
+class Job(models.Model):
+
+    route = models.ForeignKey(Route, on_delete=models.CASCADE)
+    message = models.CharField(max_length=200, default='loading...')
+    status = models.BooleanField(default=False)
+    base_distance = models.FloatField(default=0.0)
+    shortest = models.FloatField(default=0.0)
+    method = models.CharField(max_length=20, default='')
+    two_opt = models.BooleanField(default=False)
+    two_opt_improvement = models.FloatField(default=0.0)
+    three_opt = models.BooleanField(default=False)
+    three_opt_improvement = models.FloatField(default=0.0)
+
+    # performance measurements
+    distance_matrix_generation_ms=models.FloatField(default=-1)
+    base_algorithm_ms=models.FloatField(default=-1)
+    two_opt_ms=models.FloatField(default=-1)
+    three_opt_ms=models.FloatField(default=-1)
+
         
 # helper method to calculate straight line distance between two zones
 def straightLineDistance(start, end):
@@ -151,13 +169,22 @@ def route(start, end):
     return routeData
 
 # helper method to generate distance matrix of A->B distances
-def generateDistanceMatrix(zones):
+def generateDistanceMatrix(zones, job):
+
+    expectedElements = len(zones)*len(zones)
+
     distanceMatrix = {zone:{} for zone in zones}
+    count = 0
     for zoneA in zones:
         for zoneB in zones:
             start = Zone.objects.get(id=zoneA)
             end = Zone.objects.get(id=zoneB)
             distance = Distance.objects.get_or_create(zone_a=start, zone_b=end)[0].distance
             distanceMatrix[zoneA].update({zoneB: distance})
+            if count % 100 == 0:
+                job.message = f"Generating distance matrix ({count} of {expectedElements})"
+                job.save()
+            count += 1
+
     return distanceMatrix
 

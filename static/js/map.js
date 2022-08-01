@@ -159,6 +159,7 @@ window.onload = function () {
         var payload = [];
         selectedMarkerGroup.eachLayer(marker => payload.push(marker.options.id))
 
+
         // make request to back_end optimisation engine - when ready redirect to route page
         fetch("/optimise/", {
             method: 'POST',
@@ -169,7 +170,54 @@ window.onload = function () {
             body: JSON.stringify(payload),
             credentials: 'same-origin',
         }).then(response => response.text())
-        .then(response => window.location.replace("http://127.0.0.1:8000/route" + response + "/"));
+        .then(response => showLoading(response));
+        //.then(response => window.location.replace("http://127.0.0.1:8000/route" + response + "/"));
+
+    }
+
+    function showLoading(id) {
+
+        
+        done = false;
+
+        function update() {
+
+                fetch("/status/", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify([id]),
+                credentials: 'same-origin',
+            })
+            .then(response => response.json())
+            .then(function(data) {
+                if (!data.status) {
+                    console.log(data);
+                } else {
+                    console.log(data);
+                    clearInterval(repeatJob)
+                    window.location.replace("http://127.0.0.1:8000/route" + id + "/")
+                }
+                
+            })
+        }
+
+        repeatJob = setInterval(update, 1000);
+                
+            
+
+            
+
+            
+        
+        
+            
+        
+
+            
+        //}
 
     }
 

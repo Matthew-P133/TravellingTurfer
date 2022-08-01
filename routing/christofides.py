@@ -1,12 +1,23 @@
 import itertools
 from math import dist, perm
 
-def optimise(zones, distanceMatrix):
+def optimise(zones, distanceMatrix, job):
 
+    job.message = "Finding minimum spanning tree"
+    job.save()
     MST = minimumSpanningTree(zones, distanceMatrix)
     oddDegreeVertices = findOddDegreeVertices(MST)
+
+    job.message = "Generating Eulerian Multigraph"
+    job.save()
     eulerianMultigraph = generateEulerianMultigraph(MST, oddDegreeVertices, distanceMatrix)
+
+    job.message = "Generating Eulerian Tour"
+    job.save()
     eulerTour = fleury(eulerianMultigraph)
+
+    job.message = "Finding Hamiltonian"
+    job.save()
     route = hamiltonian(eulerTour)
     route.append(route[0])
     return route
