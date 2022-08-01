@@ -103,7 +103,7 @@ class OptimiseTest(TestCase):
         id = json.loads(response.content)
         waypoints = Waypoints.objects.filter(route_id=id)
         self.assertEqual(len(waypoints), len(json.loads(payload))+1)
-        correctOrder = [16006, 15378, 173258, 16975, 16006]
+        correctOrder = [16006, 16975, 173258, 15378, 16006]
         for i, waypoint in enumerate(waypoints):
             self.assertEqual(waypoint.position, i)
             self.assertEqual(waypoint.zone_id, correctOrder[i])
