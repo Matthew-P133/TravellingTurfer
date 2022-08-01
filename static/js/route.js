@@ -1,5 +1,7 @@
 window.onload = function () {
 
+    
+
     // display map
     var map = L.map('map').setView([59.3357, 18.07292], 11);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -11,10 +13,13 @@ window.onload = function () {
     // contains the zones in the route
     markerGroup = L.layerGroup().addTo(map);
     routeGroup = L.layerGroup().addTo(map);
+    var geoJSON;
 
     // add route to map
     id = parseInt(document.getElementById('id').innerHTML);
     loadRoute(id);
+
+    document.getElementById('downloadRoute').addEventListener('click', downloadRoute);
     
     // gets route from back end and draws it on the map
     function loadRoute(id) {
@@ -75,9 +80,10 @@ window.onload = function () {
     function drawRoute(data) {
         markerGroup.clearLayers();
         routeGroup.clearLayers();
+        geoJSON = data.geoJSON
         centreMap(data.geoJSON);
         L.geoJSON(data.geoJSON, {style: style}).addTo(routeGroup);
-        drawZones(data.zones)
+        drawZones(data.zones);
     }
 
     function drawZones(data) {
@@ -96,7 +102,6 @@ window.onload = function () {
 
     // changes start/end point to clicked zone or reverses direction of route
     function onCircleClick(e) {
-        console.log(e.target.options);
         fetch("/update/", {
             method: 'POST',
             headers: {
@@ -107,6 +112,22 @@ window.onload = function () {
             credentials: 'same-origin',
         })
             .then(loadRoute(id));
+    }
+
+
+    function downloadRoute() {
+
+        blob = new Blob([togpx(geoJSON)]);
+        url = window.URL.createObjectURL(blob);
+
+        a = document.createElement('a');
+        document.body.appendChild(a);
+        a.style = "display: none";
+        a.href = url;
+        a.download = 'TravellingTurfer_Route' + id.toString() + ".gpx";
+        a.click();
+
+        window.URL.revokeObjectURL(url);
     }
 };
 

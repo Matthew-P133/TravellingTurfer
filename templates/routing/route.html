@@ -3,6 +3,7 @@
 
 {% block script_block %}
 <script src="{% static 'js/route.js' %}"></script>
+<script src="{% static 'js/togpx.js' %}"></script>
 <link rel="stylesheet" href="{% static '/style/map.css' %}">
 {% endblock %}
 
@@ -16,4 +17,6 @@
 
 
     <div id="map"></div>
+
+    <div><button id='downloadRoute'>Download Route</button></div>
 {% endblock %}

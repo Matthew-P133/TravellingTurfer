@@ -65,7 +65,6 @@ class Route(models.Model):
 
         return geoJSON
 
-    
 def createRoute(zones):
 
     route = Route()
