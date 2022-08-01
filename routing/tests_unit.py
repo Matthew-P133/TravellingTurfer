@@ -210,3 +210,65 @@ class ModelsTest(TestCase):
         self.assertTrue('coordinates' in geoJSON)
         self.assertTrue(geoJSON['coordinates'] is not None)
         self.assertEquals(len(geoJSON['coordinates']), 353)
+
+
+class UpdateTest(TestCase):
+
+    fixtures = ['testZones.json', 'testDistances.json', 'testRoutes.json', 'testWaypoints.json']
+
+    def test_reverse_route(self):
+        # initial order of zones in route
+        ordered_zones = [waypoint.zone_id for waypoint in Waypoints.objects.filter(route_id=215).order_by('position')]
+        # reverse route
+        payload = json.dumps({'id': 215, 'zone_id': 16065})
+        response = self.client.post('/update/', payload, content_type='application/json')
+        self.assertEquals(response.status_code, 200)
+        new_ordered_zones = [waypoint.zone_id for waypoint in Waypoints.objects.filter(route_id=215).order_by('position')]
+        self.assertTrue(ordered_zones == new_ordered_zones[::-1])
+        # re-reverse route
+        payload = json.dumps({'id': 215, 'zone_id': 16065})
+        response = self.client.post('/update/', payload, content_type='application/json')
+        self.assertEquals(response.status_code, 200)
+        new_ordered_zones = [waypoint.zone_id for waypoint in Waypoints.objects.filter(route_id=215).order_by('position')]
+        self.assertTrue(ordered_zones == new_ordered_zones)
+
+    def test_change_start_and_reverse_route(self):
+        # change start to zone with position 1
+        payload = json.dumps({'id': 215, 'zone_id': 15447})
+        response = self.client.post('/update/', payload, content_type='application/json')
+        self.assertEquals(response.status_code, 200)
+        new_ordered_zones = [waypoint.zone_id for waypoint in Waypoints.objects.filter(route_id=215).order_by('position')]
+        self.assertTrue(new_ordered_zones == [15447, 173254, 15396, 15448, 16064, 16066, 16068, 16069, 16067, 15457, 15378, 15713, 476525, 15459, 15458, 173257, 15380, 173256, 173255, 15379, 476496, 15714, 476494, 15460, 16075, 16073, 15454, 15446, 16065, 15447])
+        # change start to zone mid-way through route
+        payload = json.dumps({'id': 215, 'zone_id': 15380})
+        response = self.client.post('/update/', payload, content_type='application/json')
+        self.assertEquals(response.status_code, 200)
+        new_ordered_zones = [waypoint.zone_id for waypoint in Waypoints.objects.filter(route_id=215).order_by('position')]
+        self.assertTrue(new_ordered_zones == [15380, 173256, 173255, 15379, 476496, 15714, 476494, 15460, 16075, 16073, 15454, 15446, 16065, 15447, 173254, 15396, 15448, 16064, 16066, 16068, 16069, 16067, 15457, 15378, 15713, 476525, 15459, 15458, 173257, 15380])
+        # reverse altered route
+        ordered_zones = new_ordered_zones
+        payload = json.dumps({'id': 215, 'zone_id': ordered_zones[0]})
+        response = self.client.post('/update/', payload, content_type='application/json')
+        self.assertEquals(response.status_code, 200)
+        new_ordered_zones = [waypoint.zone_id for waypoint in Waypoints.objects.filter(route_id=215).order_by('position')]
+        self.assertTrue(ordered_zones == new_ordered_zones[::-1])
+
+    def test_request_method(self):
+        response = self.client.get('/update/')
+        self.assertEquals(response.status_code, 405)
+
+    def test_malformed_requests(self):
+        # empty payload
+        payload = ''
+        response = self.client.post('/update/', payload, content_type='application/json')
+        self.assertEquals(response.status_code, 400)
+        # payload contains non-integers
+        payload = 'random'
+        response = self.client.post('/update/', payload, content_type='application/json')
+        self.assertEquals(response.status_code, 400)
+
+    def test_invalid_request(self):
+        # zone id not in route
+        payload = json.dumps({'id': 215, 'zone_id': 1000000})
+        response = self.client.post('/update/', payload, content_type='application/json')
+        self.assertEquals(response.status_code, 400)
