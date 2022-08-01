@@ -159,7 +159,7 @@ window.onload = function () {
             body: JSON.stringify(payload),
             credentials: 'same-origin',
         }).then(response => response.text())
-        .then(response => window.location.replace("http://127.0.0.1:8000/route" + response));
+        .then(response => window.location.replace("http://127.0.0.1:8000/route" + response + "/"));
 
     }
 
@@ -170,7 +170,6 @@ window.onload = function () {
     function selectVisible() {
         // select all visible unselected markers
         markerGroup.eachLayer(function (layer) {
-            console.log(layer.options)
             layer.setStyle({ color: '#ff0000' });
             markerGroup.removeLayer(layer);
             selectedMarkerGroup.addLayer(layer);

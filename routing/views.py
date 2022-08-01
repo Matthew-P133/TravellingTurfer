@@ -109,23 +109,75 @@ def optimise(request):
 # generates geoJSON for display of a given route
 def generate(request):
     if request.method == 'POST':
-
-
         # check request data
         try:
             id = json.loads(request.body)
         except:
             return HttpResponseBadRequest()
-
         if not len(id) == 1 or not isinstance(id[0], int):
             return HttpResponseBadRequest()
-
         try:
-            geoJSON = Route.objects.get(id=id[0]).getGeoJSON()
-            return JsonResponse(geoJSON)
+            route = Route.objects.get(id=id[0])
+            geoJSON = route.getGeoJSON()
+            waypoints = Waypoints.objects.filter(route=route)
+            zones = Zone.objects.filter(id__in=[waypoint.zone_id for waypoint in waypoints]).values()
+            waypointsDict = {}
+
+            for waypoint in waypoints:
+                if not waypoint.zone_id in waypointsDict or waypoint.position == 0:
+                    waypointsDict.update({waypoint.zone_id: waypoint.position})
+
+            for zone in zones:
+                zone['position'] = waypointsDict[zone['id']]
+                
+            response = {'geoJSON': geoJSON, 'zones': list(zones)}
+            return JsonResponse(response)
         except:
             return HttpResponseBadRequest()
-
     else:
         return HttpResponseNotAllowed(permitted_methods=['POST'])
+
+# changes the start/end zone for a route, or reverses the route
+def update(request):
+
+    if request.method == 'POST':
+        # check request data
+        try:
+            data = json.loads(request.body)
+            route_id = data['id']
+            zone_id = data['zone_id']
+        except:
+            return HttpResponseBadRequest()
+        if not len(data) == 2 or not all(key in data for key in ['id', 'zone_id']):
+            return HttpResponseBadRequest()
+        try:
+            route = Route.objects.get(id=route_id)
+            waypoints = Waypoints.objects.filter(route=route).order_by('position')
+
+            offset = waypoints.filter(zone_id=zone_id)[0].position
+            route_length = len(waypoints)
+
+            # start (or end) zone selected; reverse route direction
+            if offset == 0 or offset == route_length-1:
+                for i, waypoint in enumerate(waypoints):
+                    waypoint.position = route_length - 1 - i
+                    waypoint.save()
+            # change start point of route 
+            else:
+                Waypoints.objects.filter(route_id=route_id, position=route_length-1).delete()
+                for waypoint in Waypoints.objects.filter(route=route):
+                    current_position = waypoint.position
+                    new_position = current_position - offset
+                    if new_position == 0:
+                        Waypoints.objects.create(route_id=route_id, position=route_length-1, zone_id=zone_id)
+                    if new_position < 0:
+                        new_position = route_length + new_position - 1
+                    waypoint.position = new_position
+                    waypoint.save()
+            return HttpResponse()
+        except:
+            return HttpResponseBadRequest()
+    else:    
+        return HttpResponseNotAllowed(permitted_methods=['POST'])
+
 

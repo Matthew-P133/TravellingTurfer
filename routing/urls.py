@@ -12,5 +12,6 @@ urlpatterns = [
     path('zones/', views.zones),
     path('optimise/', views.optimise),
     path('generate/', views.generate),
+    path('update/', views.update),
     path('favicon.ico', RedirectView.as_view(url=staticfiles_storage.url('img/favicon.ico')))
 ]

@@ -8,10 +8,13 @@ window.onload = function () {
         preferCanvas: true,
     }).addTo(map);
 
+    // contains the zones in the route
+    markerGroup = L.layerGroup().addTo(map);
+    routeGroup = L.layerGroup().addTo(map);
+
     // add route to map
     id = parseInt(document.getElementById('id').innerHTML);
     loadRoute(id);
-
     
     // gets route from back end and draws it on the map
     function loadRoute(id) {
@@ -70,8 +73,40 @@ window.onload = function () {
     };
 
     function drawRoute(data) {
-        centreMap(data);
-        L.geoJSON(data, {style: style}).addTo(map);
+        markerGroup.clearLayers();
+        routeGroup.clearLayers();
+        centreMap(data.geoJSON);
+        L.geoJSON(data.geoJSON, {style: style}).addTo(routeGroup);
+        drawZones(data.zones)
+    }
+
+    function drawZones(data) {
+        routeLength = data.length
+
+        data.forEach(function(zone) {
+            zoneLatLng = L.latLng((zone.latitude), (zone.longitude));;
+            circle_marker = L.circle(zoneLatLng, { 'radius': 30 }).addTo(markerGroup);
+            circle_marker.on("click", onCircleClick);
+            circle_marker.bindTooltip(zone.position.toString()).openTooltip();
+            // attach zone properties to marker
+            L.setOptions(circle_marker, zone);
+        })
+        
+    }
+
+    // changes start/end point to clicked zone or reverses direction of route
+    function onCircleClick(e) {
+        console.log(e.target.options);
+        fetch("/update/", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({'id': id, 'zone_id': e.target.options.id}),
+            credentials: 'same-origin',
+        })
+            .then(loadRoute(id));
     }
 };
 
