@@ -16,7 +16,7 @@ window.onload = function () {
     var geoJSON;
 
     // add route to map
-    id = parseInt(document.getElementById('id').innerHTML);
+    id = parseInt(document.getElementById("id").innerHTML);
     loadRoute(id);
 
     document.getElementById('downloadRoute').addEventListener('click', downloadRoute);

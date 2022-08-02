@@ -1,1 +1,70 @@
-#map { height: 600px }
+#map { 
+    height: 75vh; 
+
+}
+
+#navbar {
+    display: flex;
+    margin-bottom: 2px;
+    flex-direction: row; 
+}
+
+#statsbar {
+    display: flex;
+    margin-top: 2px;
+    flex-direction: row;
+}
+
+.stats {
+    flex: 1;
+    padding: 0.5em;
+    background-color: rgba(233, 229, 14, 0.2);
+    text-align: center;
+    margin-top: 0;
+    font-size: 1em;
+    font-family: sans-serif;
+}
+
+button {
+    flex: 1;
+    margin: 0 2px 0;
+    min-height: 2rem;
+    background-color: rgba(233, 229, 14, 0.2);
+    font-size: 1em;
+    font-family: sans-serif;
+}
+
+#main {
+    margin-left: 2.5vh;
+    margin-right: 2.5vh;
+}
+
+#header {
+    display: flex;
+}
+
+#logo {
+    align-self: flex-start;
+}
+
+#help {
+    margin-left: auto;
+}
+
+h1 {
+    margin-bottom: 2vh;
+    margin-top: 0;
+    color: rgb(233, 229, 14);
+    text-shadow: 0.1px 1px 2px black;
+}
+
+h1 a {
+    color: inherit;
+    text-decoration: inherit;
+    outline: inherit;
+}
+
+#id {
+    display: none;
+}
+

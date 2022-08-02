@@ -58,7 +58,7 @@ class ZoneAPITest(TestCase):
 
     def test_request_large_area(self):
         payload = {
-            'northEastLat': 59.35,
+            'northEastLat': 60.35,
             'northEastLong': 18.19,
             'southWestLat': 59.05,
             'southWestLong': 17.05

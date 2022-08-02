@@ -20,7 +20,9 @@ window.onload = function () {
     markerGroup = L.layerGroup().addTo(map);
     selectedMarkerGroup = L.layerGroup().addTo(map);
 
-    map.whenReady(onMapMoveEnd);
+    onMapMoveEnd();
+
+
 
 
     // defines action to take when a zone marker is clicked
@@ -46,13 +48,10 @@ window.onload = function () {
         if (map.getZoom() >= 11) {
 
             updateZones(map.getBounds().getNorthEast(), map.getBounds().getSouthWest());
-
-            document.getElementById("prompt").innerHTML = "";
             map.hasLayer(markerGroup) ? {} : map.addLayer(markerGroup);
             map.hasLayer(selectedMarkerGroup) ? {} : map.addLayer(selectedMarkerGroup);
         } else {
             // zoomed out too far
-            document.getElementById("prompt").innerHTML = "Zoom in to see zones"
             map.removeLayer(markerGroup);
             map.removeLayer(selectedMarkerGroup);
         }
@@ -77,7 +76,7 @@ window.onload = function () {
             credentials: 'same-origin',
         })
             .then(response => response.json())
-            .then(data => drawZones(data));
+            .then(data => drawZones(data))
     }
 
 
@@ -105,33 +104,37 @@ window.onload = function () {
         // clear all (unselected) zones before drawing new ones (avoids slowdown associated with displaying lots of zones)
         markerGroup.clearLayers();
 
-        // put each zone on map (if not already present as a selected zone) and attach event listener to each
-        zoneArray.forEach(zone => {
+        if (!zoneArray[0]['error']) {
 
-            zoneLatLng = L.latLng((zone.latitude), (zone.longitude));
-            zonePresent = false;
+            // put each zone on map (if not already present as a selected zone) and attach event listener to each
+            zoneArray.forEach(zone => {
 
-            selectedMarkerGroup.eachLayer(function (layer) {
-                if (layer instanceof L.Circle) {
-                    if (layer.getLatLng().equals(zoneLatLng)) {
-                        zonePresent = true;
+                zoneLatLng = L.latLng((zone.latitude), (zone.longitude));
+                zonePresent = false;
+
+                selectedMarkerGroup.eachLayer(function (layer) {
+                    if (layer instanceof L.Circle) {
+                        if (layer.getLatLng().equals(zoneLatLng)) {
+                            zonePresent = true;
+                        }
                     }
+                });
+
+                if (!zonePresent) {
+                    circle_marker = L.circle(zoneLatLng, { 'radius': 30 }).addTo(markerGroup);
+                    circle_marker.on("click", onCircleClick);
+
+                    // attach zone properties to marker
+                    L.setOptions(circle_marker, zone);
                 }
             });
-
-            if (!zonePresent) {
-                circle_marker = L.circle(zoneLatLng, { 'radius': 30 }).addTo(markerGroup);
-                circle_marker.on("click", onCircleClick);
-
-                // attach zone properties to marker
-                L.setOptions(circle_marker, zone);
-            }
-        });
+        }
     }
 
 
     // attach event functions to event listeners
     map.on("moveend", onMapMoveEnd);
+    map.on("resize", onMapMoveEnd);
     
 
 
@@ -177,11 +180,7 @@ window.onload = function () {
 
     function showLoading(id) {
 
-        
-        done = false;
-
         function update() {
-
                 fetch("/status/", {
                 method: 'POST',
                 headers: {
@@ -194,31 +193,15 @@ window.onload = function () {
             .then(response => response.json())
             .then(function(data) {
                 if (!data.status) {
-                    console.log(data);
+                    document.getElementById('status').innerHTML = JSON.stringify(data);
                 } else {
-                    console.log(data);
+                    document.getElementById('status').innerHTML = JSON.stringify(data);
                     clearInterval(repeatJob)
                     window.location.replace("http://127.0.0.1:8000/route" + id + "/")
                 }
-                
             })
         }
-
         repeatJob = setInterval(update, 1000);
-                
-            
-
-            
-
-            
-        
-        
-            
-        
-
-            
-        //}
-
     }
 
     document.getElementById('selectVisible').addEventListener('click', selectVisible);
@@ -258,8 +241,6 @@ window.onload = function () {
             updateStats();
     };
 
-
-
     function toggleMap() {
         if (map.hasLayer(normalMap)) {
             map.removeLayer(normalMap)
@@ -271,7 +252,3 @@ window.onload = function () {
         }
     }
 };
-
-
-
-

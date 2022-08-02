@@ -43,7 +43,7 @@ def zones(request):
     southWestLong = coords['southWestLong']
 
     # get zones from database if not too large an area
-    if (abs(northEastLat - southWestLat) < 0.25 and abs(northEastLong - southWestLong) < 1.0):
+    if (abs(northEastLat - southWestLat) < 0.4 and abs(northEastLong - southWestLong) < 1.5):
         zones = Zone.objects.filter(latitude__gte=southWestLat).filter(longitude__gte=southWestLong).filter(latitude__lte=northEastLat).filter(longitude__lte=northEastLong).values()
         return JsonResponse(list(zones), safe=False)
     else:

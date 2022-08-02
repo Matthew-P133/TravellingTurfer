@@ -13,10 +13,28 @@
 
 
 {% block body_block %}
-    <div id='id'>{{id}}</div>
+    
 
 
-    <div id="map"></div>
+    
 
-    <div><button id='downloadRoute'>Download Route</button></div>
+    <p id="id">{{id}}</p>
+
+    <div id="main">
+        <div id="header">
+            <h1 id="logo"><a href="">Travelling Turfer</a></h1>
+            <h1 id="help">?</h1>
+        </div>
+        <div id="navbar">
+            <button id='downloadRoute'>Download Route</button>
+            <button id='shareRoute'>Share Route</button>
+        </div>
+        <div id="map"></div>
+        <div id="statsbar">
+            [TODO - route statistics]
+        </div>
+    </div>
+
+
+
 {% endblock %}

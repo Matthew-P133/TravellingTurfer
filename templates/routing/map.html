@@ -12,21 +12,33 @@
 
 {% block body_block %}
 
-    <p id="prompt"></p>
-    <p id="stats">Selected zones: <span id="selectedZoneCount"></span></p>
-    <p id="stats">Points per hour: <span id="selectedZonePointsPerHour"></span></p>
-    <p id="stats">Takover points: <span id="selectedZoneTakeoverPoints"></span></p>
 
-    <p id="stats">Status: <span id="status"></span></p>
-    <div><button id='toggleMap'>Toggle Map</button></div>
 
+<div id="main">
+    <div id="header">
+        <h1 id="logo"><a href="">Travelling Turfer</a></h1>
+        <h1 id="help">?</h1>
+    </div>
+    <div id="navbar">
+        <button id='createRoute'>Create Route</button>
+        <button id='selectVisible'>Select Visible</button>
+        <button id='deselectVisible'>De-select Visible</button>
+        <button id='deselectAll'>De-select All</button>
+        <button id='toggleMap'>Toggle Map</button>
+    </div>
     <div id="map"></div>
+    <div id="statsbar">
+        <p class="stats">Selected zones: <span id="selectedZoneCount">0</span></p>
+        <p class="stats">Points per hour: <span id="selectedZonePointsPerHour">0</span></p>
+        <p class="stats">Takeover points: <span id="selectedZoneTakeoverPoints">0</span></p>
 
-    <div><button id='createRoute'>Create Route</button></div>
-    <div><button id='selectVisible'>Select Visible</button></div>
-    <div><button id='deselectVisible'>De-select Visible</button></div>
-    <div><button id='deselectAll'>De-select All</button></div>
+    </div>
+</div>
 
 
+
+    
+    
+    <p class="loading">Status: <span id="status"></span></p>
 
 {% endblock %}
