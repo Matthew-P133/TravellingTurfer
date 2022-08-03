@@ -21,6 +21,7 @@ window.onload = function () {
     updateStats(id);
 
     document.getElementById('downloadRoute').addEventListener('click', downloadRoute);
+    document.getElementById('shareRoute').addEventListener('click', copyURL);
     
     // gets route from back end and draws it on the map
     function loadRoute(id) {
@@ -164,6 +165,42 @@ window.onload = function () {
         } else {
             elem.setAttribute('class', 'overlay')
         }
+    }
+
+
+    function copyURL() {
+        
+        url = window.location.toString();
+        navigator.clipboard.writeText(url);
+        overlay("Route URL copied to clipboard");
+      } 
+
+    function overlay(text) {
+
+        newOverlay = document.createElement('div')
+        newOverlay.setAttribute('class', 'overlay')
+
+        overlayItem = document.createElement('div')
+        overlayItem.setAttribute('class', 'alert')
+        
+        p = document.createElement('p')
+        p.innerHTML = text;
+        overlayItem.appendChild(p);
+
+        closeButton = document.createElement('div')
+        closeButton.setAttribute('class', 'close-button')
+        closeButton.innerHTML = "&#10060;"
+        closeButton.addEventListener('click', closeAlert);
+
+
+        newOverlay.appendChild(overlayItem);
+        newOverlay.appendChild(closeButton);
+        document.body.appendChild(newOverlay);
+    }
+
+    function closeAlert(e) {
+        console.log(e.target.parentNode)
+        e.target.parentNode.remove();
     }
 
 };
