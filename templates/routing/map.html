@@ -34,24 +34,24 @@
     </div>
 </div>
 
-<div class="loader-hidden" id="loader">
-    <div class="loader-header"><p id="loader-status-message">Processing</p><div class="status-icon">...</div></div>
-    <div class="loader-info-hidden"><p id="loader-distance-matrix-message">TODO</p><div class="status-icon">...</div></div>
-    <div class="loader-info-hidden"><p id="loader-base-algorithm-message">TODO</p><div class="status-icon">...</div></div>
-    <div class="loader-info-hidden"><p id="loader-two-opt-message">TODO</p><div class="status-icon">...</div></div>
-    <div class="loader-info-hidden"><p id="loader-three-opt-message">TODO</p><div class="status-icon">...</div></div>
-    <div class="loader-info-hidden"><p id="loader-summary-message">TODO</p><div class="status-icon">...</div></div>
-    <div class="loader-info-hidden"><button id='goToRoute'>Show route</button></div>
+<div class="overlay-hidden" id="loader">
+    <div class="overlay-header"><p id="loader-status-message">Processing</p><div class="status-icon">...</div></div>
+    <div class="overlay-item-hidden"><p id="loader-distance-matrix-message">TODO</p><div class="status-icon">...</div></div>
+    <div class="overlay-item-hidden"><p id="loader-base-algorithm-message">TODO</p><div class="status-icon">...</div></div>
+    <div class="overlay-item-hidden"><p id="loader-two-opt-message">TODO</p><div class="status-icon">...</div></div>
+    <div class="overlay-item-hidden"><p id="loader-three-opt-message">TODO</p><div class="status-icon">...</div></div>
+    <div class="overlay-item-hidden"><p id="loader-summary-message">TODO</p><div class="status-icon">...</div></div>
+    <div class="overlay-item-hidden" id="showRoute"><button id='goToRoute'>Show route</button></div>
 </div>
 
-<div class="instructions-hidden" id="instructions">
+<div class="overlay-hidden" id="instructions">
     <div id="help-close">&#10060;</div>
-    <p id="instructions-header">Instructions</p>
-    <p class="instruction">Pan and zoom around to find desired area</p>
-    <p class="instruction">Click or select zones for inclusion in  your route</p>
-    <p class="instruction">Use 'Toggle Map' to swap between map and satellite</p>
-    <p class="instruction">Press 'Create Route' to begin route optimisation</p>
-    <p class="instruction">Happy Turfing!</p>
+    <p class="overlay-header">Instructions</p>
+    <p class="overlay-item">Pan and zoom around to find desired area</p>
+    <p class="overlay-item">Click or select zones for inclusion in  your route</p>
+    <p class="overlay-item">Use 'Toggle Map' to swap between map and satellite</p>
+    <p class="overlay-item">Press 'Create Route' to begin route optimisation</p>
+    <p class="overlay-item">Happy Turfing!</p>
 </div>
 
 {% endblock %}

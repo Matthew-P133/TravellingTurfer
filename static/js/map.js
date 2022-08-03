@@ -174,7 +174,7 @@ window.onload = function () {
             credentials: 'same-origin',
         }).then(response => response.text())
         .then(function(response) {
-            document.getElementById('loader').setAttribute('class', 'loader');
+            document.getElementById('loader').setAttribute('class', 'overlay');
             document.getElementById('id').innerHTML = response;
             showLoading(response);
         })
@@ -220,10 +220,10 @@ window.onload = function () {
 
     function toggleInstructions() {
         elem = document.getElementById('instructions')
-        if (elem.className == 'instructions') {
-            elem.setAttribute('class', 'instructions-hidden')
+        if (elem.className == 'overlay') {
+            elem.setAttribute('class', 'overlay-hidden')
         } else {
-            elem.setAttribute('class', 'instructions')
+            elem.setAttribute('class', 'overlay')
         }
     }
 
@@ -281,55 +281,52 @@ window.onload = function () {
             elem = document.getElementById("loader-distance-matrix-message")
             if (data.distance_matrix_generation_ms == -1) {
                 elem.innerHTML = data.message;
-                elem.parentElement.setAttribute("class", 'loader-info')
+                elem.parentElement.setAttribute("class", 'overlay-item')
             } else {
                 elem.nextSibling.innerHTML = "&#x2705;"
                 elem.innerHTML = `Generated distance matrix  in ${data.distance_matrix_generation_ms.toPrecision(3)} s`;
-                elem.parentElement.setAttribute("class", 'loader-info')
+                elem.parentElement.setAttribute("class", 'overlay-item')
 
                 elem = document.getElementById("loader-base-algorithm-message")
                 if (data.base_algorithm_ms == -1) {
                     elem.innerHTML = `Performing ${data.method} algorithm`;
-                    elem.parentElement.setAttribute("class", 'loader-info')
+                    elem.parentElement.setAttribute("class", 'overlay-item')
                 } else {
                     elem.nextSibling.innerHTML = "&#x2705;"
                     elem.innerHTML = `${data.method}: found ${data.base_distance.toPrecision(3)} km route in ${data.base_algorithm_ms.toPrecision(3)} s`;
-                    elem.parentElement.setAttribute("class", 'loader-info')
+                    elem.parentElement.setAttribute("class", 'overlay-item')
 
 
                     if (data.two_opt) {
                         elem = document.getElementById("loader-two-opt-message")
                         if (data.two_opt_ms == -1) {
                             elem.innerHTML = `Optimising route with two-opt`;
-                            elem.parentElement.setAttribute("class", 'loader-info')
+                            elem.parentElement.setAttribute("class", 'overlay-item')
                         }
                         else {
                             elem.nextSibling.innerHTML = "&#x2705;"
                             elem.innerHTML = `Two-opt: shortened by ${data.two_opt_improvement.toPrecision(3)} km in ${data.two_opt_ms.toPrecision(3)} s`;
-                            elem.parentElement.setAttribute("class", 'loader-info')
+                            elem.parentElement.setAttribute("class", 'overlay-item')
                             
                             if (data.three_opt) {
                                 elem = document.getElementById("loader-three-opt-message")
                                 if (data.three_opt_ms == -1) {
                                     elem.innerHTML = `Optimising route with three-opt`;
-                                    elem.parentElement.setAttribute("class", 'loader-info')
+                                    elem.parentElement.setAttribute("class", 'overlay-item')
                                 }
                                 else {
                                     elem.nextSibling.innerHTML = "&#x2705;"
                                     elem.innerHTML = `Three-opt: shortened by ${data.three_opt_improvement.toPrecision(3)} km in ${data.three_opt_ms.toPrecision(3)} s`;
-                                    elem.parentElement.setAttribute("class", 'loader-info');
+                                    elem.parentElement.setAttribute("class", 'overlay-item');
                                 }
                             }
                         } 
                     }
-                }
-
-                if (data.status) {
                     elem = document.getElementById("loader-status-message")
                     elem.nextSibling.innerHTML = "&#x2705;"
                     elem.innerHTML = "Processed";
                     
-                    elem = document.getElementById('goToRoute').parentElement.setAttribute('class', 'loader-info');
+                    elem = document.getElementById('goToRoute').parentElement.setAttribute('class', 'overlay-item');
                 }
             }
         }

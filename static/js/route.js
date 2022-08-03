@@ -159,10 +159,10 @@ window.onload = function () {
 
     function toggleInstructions() {
         elem = document.getElementById('instructions')
-        if (elem.className == 'instructions') {
-            elem.setAttribute('class', 'instructions-hidden')
+        if (elem.className == 'overlay') {
+            elem.setAttribute('class', 'overlay-hidden')
         } else {
-            elem.setAttribute('class', 'instructions')
+            elem.setAttribute('class', 'overlay')
         }
     }
 
