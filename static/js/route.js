@@ -18,6 +18,7 @@ window.onload = function () {
     // add route to map
     id = parseInt(document.getElementById("id").innerHTML);
     loadRoute(id);
+    updateStats(id);
 
     document.getElementById('downloadRoute').addEventListener('click', downloadRoute);
     
@@ -34,7 +35,28 @@ window.onload = function () {
             credentials: 'same-origin',
         })
             .then(response => response.json())
-            .then(data => drawRoute(data));
+            .then(function(data) {
+                drawRoute(data);
+            });
+    }
+
+    function updateStats(id) {
+        fetch("/route-stats/", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify([id]),
+            credentials: 'same-origin',
+        })
+            .then(response => response.json())
+            .then(function(data) {
+                document.getElementById('routeDistance').innerHTML = data.distance;
+                document.getElementById('routeZones').innerHTML = data.length;
+                document.getElementById('routePointsPerHour').innerHTML = data.points_per_hour;
+                document.getElementById('routeTakeoverPoints').innerHTML = data.takeover_points;
+            });
     }
 
     // returns value of the cookie with a given name, or null if the cookie is undefined

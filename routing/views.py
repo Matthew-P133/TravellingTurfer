@@ -1,3 +1,4 @@
+from pstats import Stats
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse, HttpResponseNotAllowed, HttpResponseBadRequest
 from django.urls import reverse
@@ -174,6 +175,38 @@ def generate(request):
             response = {'geoJSON': geoJSON, 'zones': list(zones)}
             return JsonResponse(response)
         except:
+            return HttpResponseBadRequest()
+    else:
+        return HttpResponseNotAllowed(permitted_methods=['POST'])
+
+
+def route_stats(request):
+    if request.method == 'POST':
+        # check request data
+        try:
+            id = json.loads(request.body)
+        except:
+            return HttpResponseBadRequest()
+        if not len(id) == 1 or not isinstance(id[0], int):
+            return HttpResponseBadRequest()
+        try:
+            route = Route.objects.get(id=id[0])
+            waypoints = Waypoints.objects.filter(route=route)
+            zones = Zone.objects.filter(id__in=[waypoint.zone_id for waypoint in waypoints]).values()
+
+            distance = round(route.getDistance(), 1)
+            length = len(waypoints) - 1
+            points_per_hour = 0
+            takeover_points = 0
+
+            for zone in zones:
+                points_per_hour += zone['points_per_hour']
+                takeover_points += zone['takeover_points']
+        
+            response = {'distance': distance, 'length': length, 'points_per_hour': points_per_hour, 'takeover_points': takeover_points}
+            return JsonResponse(response)
+        except Exception as e:
+            print(e)
             return HttpResponseBadRequest()
     else:
         return HttpResponseNotAllowed(permitted_methods=['POST'])

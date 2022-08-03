@@ -14,5 +14,6 @@ urlpatterns = [
     path('generate/', views.generate),
     path('update/', views.update),
     path('status/', views.status),
+    path('route-stats/', views.route_stats),
     path('favicon.ico', RedirectView.as_view(url=staticfiles_storage.url('img/favicon.ico')))
 ]
