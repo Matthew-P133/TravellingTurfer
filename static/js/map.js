@@ -215,6 +215,19 @@ window.onload = function () {
 
     document.getElementById('goToRoute').addEventListener('click', goToRoute);
 
+    document.getElementById('help').addEventListener('click', toggleInstructions);
+    document.getElementById('help-close').addEventListener('click', toggleInstructions);
+
+    function toggleInstructions() {
+        elem = document.getElementById('instructions')
+        if (elem.className == 'instructions') {
+            elem.setAttribute('class', 'instructions-hidden')
+        } else {
+            elem.setAttribute('class', 'instructions')
+        }
+    }
+
+
     function goToRoute() {
         window.location.replace("../route" + document.getElementById('id').innerHTML + "/")
     }

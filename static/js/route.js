@@ -150,7 +150,22 @@ window.onload = function () {
         a.click();
 
         window.URL.revokeObjectURL(url);
+
+        
     }
+
+    document.getElementById('help').addEventListener('click', toggleInstructions);
+    document.getElementById('help-close').addEventListener('click', toggleInstructions);
+
+    function toggleInstructions() {
+        elem = document.getElementById('instructions')
+        if (elem.className == 'instructions') {
+            elem.setAttribute('class', 'instructions-hidden')
+        } else {
+            elem.setAttribute('class', 'instructions')
+        }
+    }
+
 };
 
 
