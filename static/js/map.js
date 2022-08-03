@@ -322,12 +322,15 @@ window.onload = function () {
                             }
                         } 
                     }
-                    elem = document.getElementById("loader-status-message")
-                    elem.nextSibling.innerHTML = "&#x2705;"
-                    elem.innerHTML = "Processed";
-                    
-                    elem = document.getElementById('goToRoute').parentElement.setAttribute('class', 'overlay-item');
+
                 }
             }
+            if (data.status) {
+                elem = document.getElementById("loader-status-message")
+                elem.nextSibling.innerHTML = "&#x2705;"
+                elem.innerHTML = "Processed";
+            
+                elem = document.getElementById('goToRoute').parentElement.setAttribute('class', 'overlay-item');
         }
+    }
 };

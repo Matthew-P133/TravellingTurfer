@@ -83,7 +83,7 @@ h1 a {
 .overlay {
     border: 1px solid grey;
     border-radius: 15px;
-    background-color: rgba(233, 229, 14, 0.8);
+    background-color: rgba(233, 229, 14, 0.9);
     z-index: 2;
     display: flex;
     flex-direction: column;

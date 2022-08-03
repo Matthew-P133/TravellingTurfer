@@ -77,21 +77,26 @@ window.onload = function () {
 
     // centres the map on centre of route
     function centreMap(data) {
-        coordinates = data['coordinates'];
-        latitudeSum = 0;
-        longitudeSum = 0;
 
-        coordinates.forEach(element => {
-            latitudeSum += element[1];
-            longitudeSum += element[0];
+        coordinates = data['coordinates'];
+
+        minLongitude = maxLongitude = coordinates[0][0];
+        minLatitude = maxLatitude = coordinates[0][1];
+
+        coordinates.forEach(function(coordinate) {
+            long = coordinate[0];
+            lat = coordinate[1];
+            if (long < minLongitude) {minLongitude = long}
+            if (long > maxLongitude) {maxLongitude = long}
+            if (lat < minLatitude) {minLatitude = lat}
+            if (lat > maxLatitude) {maxLatitude = lat}
         });
 
-        centre = [latitudeSum/coordinates.length, longitudeSum/coordinates.length]
+        topLeftBound = L.latLng(minLatitude, maxLongitude);
+        bottomRightBound = L.latLng(maxLatitude, minLongitude);
 
-        // TODO - set zoom intelligently so that route just all visible
-        zoomLevel = 16
-
-        map.setView(centre, zoomLevel)
+        bounds = L.latLngBounds(topLeftBound, bottomRightBound);
+        map.fitBounds(bounds)
     }
 
     style = {
