@@ -159,7 +159,7 @@ def route(start, end):
     routeData = {}
 
     # get A->B route from locally hosted graph hopper instance
-    response = json.loads(requests.post('http://localhost:8989/route', 
+    response = json.loads(requests.post(os.getenv('graphhopper_address'), 
                             data = json.dumps({"points": [[start.longitude, start.latitude], [end.longitude, end.latitude]],'points_encoded':False}), headers = {'Accept': 'application/json',
                             'Content-Type': 'application/json',}).content)
 

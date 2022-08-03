@@ -216,7 +216,7 @@ window.onload = function () {
     document.getElementById('goToRoute').addEventListener('click', goToRoute);
 
     function goToRoute() {
-        window.location.replace("http://127.0.0.1:8000/route" + document.getElementById('id').innerHTML + "/")
+        window.location.replace("../route" + document.getElementById('id').innerHTML + "/")
     }
 
     function selectVisible() {
