@@ -82,8 +82,8 @@ def optimise(request):
 
 def status(request):
     id = json.loads(request.body)[0]
-    job = Job.objects.get(route=Route.objects.get(id=id))
-    response = {'status': job.status, 'message': job.message, 'shortest': job.shortest}
+    job = Job.objects.filter(route=Route.objects.get(id=id))
+    response = job.values()[0]
 
     return JsonResponse(response)
 
@@ -102,7 +102,7 @@ def optimisation_job(route, zones, job):
         # main algorithm
         start = time.time()
         if len(zones) <= 7:
-            job.method = "bruteforce"
+            job.method = "Bruteforce"
             job.save()
             shortestRoute = bruteForce.optimise(zones, distanceMatrix)
         elif len(zones) <= 40:
@@ -110,7 +110,7 @@ def optimisation_job(route, zones, job):
             job.save()
             shortestRoute = christofides.optimise(zones, distanceMatrix, job)
         else:
-            job.method = "nearest neighbour"
+            job.method = "Nearest Neighbour"
             job.save()
             shortestRoute = nearestNeighbour.optimise(zones, distanceMatrix)
         end = time.time()

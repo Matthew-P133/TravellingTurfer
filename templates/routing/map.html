@@ -12,7 +12,7 @@
 
 {% block body_block %}
 
-
+<p id="id"></p>
 
 <div id="main">
     <div id="header">
@@ -31,14 +31,17 @@
         <p class="stats">Selected zones: <span id="selectedZoneCount">0</span></p>
         <p class="stats">Points per hour: <span id="selectedZonePointsPerHour">0</span></p>
         <p class="stats">Takeover points: <span id="selectedZoneTakeoverPoints">0</span></p>
-
     </div>
 </div>
 
-
-
-    
-    
-    <p class="loading">Status: <span id="status"></span></p>
+<div class="loader-hidden" id="loader">
+    <div class="loader-header"><p id="loader-status-message">Processing</p><div class="status-icon">...</div></div>
+    <div class="loader-info-hidden"><p id="loader-distance-matrix-message">TODO</p><div class="status-icon">...</div></div>
+    <div class="loader-info-hidden"><p id="loader-base-algorithm-message">TODO</p><div class="status-icon">...</div></div>
+    <div class="loader-info-hidden"><p id="loader-two-opt-message">TODO</p><div class="status-icon">...</div></div>
+    <div class="loader-info-hidden"><p id="loader-three-opt-message">TODO</p><div class="status-icon">...</div></div>
+    <div class="loader-info-hidden"><p id="loader-summary-message">TODO</p><div class="status-icon">...</div></div>
+    <div class="loader-info-hidden"><button id='goToRoute'>Show route</button></div>
+</div>
 
 {% endblock %}

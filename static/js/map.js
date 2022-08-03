@@ -173,8 +173,13 @@ window.onload = function () {
             body: JSON.stringify(payload),
             credentials: 'same-origin',
         }).then(response => response.text())
-        .then(response => showLoading(response));
-        //.then(response => window.location.replace("http://127.0.0.1:8000/route" + response + "/"));
+        .then(function(response) {
+            document.getElementById('loader').setAttribute('class', 'loader');
+            document.getElementById('id').innerHTML = response;
+            showLoading(response);
+        })
+        
+        
 
     }
 
@@ -193,11 +198,11 @@ window.onload = function () {
             .then(response => response.json())
             .then(function(data) {
                 if (!data.status) {
-                    document.getElementById('status').innerHTML = JSON.stringify(data);
+                    updateLoadingBar(data);
                 } else {
-                    document.getElementById('status').innerHTML = JSON.stringify(data);
-                    clearInterval(repeatJob)
-                    window.location.replace("http://127.0.0.1:8000/route" + id + "/")
+                    updateLoadingBar(data);
+                    clearInterval(repeatJob);
+                    
                 }
             })
         }
@@ -207,6 +212,12 @@ window.onload = function () {
     document.getElementById('selectVisible').addEventListener('click', selectVisible);
     document.getElementById('deselectVisible').addEventListener('click', deselectVisible);
     document.getElementById('deselectAll').addEventListener('click', deselectAll);
+
+    document.getElementById('goToRoute').addEventListener('click', goToRoute);
+
+    function goToRoute() {
+        window.location.replace("http://127.0.0.1:8000/route" + document.getElementById('id').innerHTML + "/")
+    }
 
     function selectVisible() {
         // select all visible unselected markers
@@ -251,4 +262,62 @@ window.onload = function () {
             normalMap.addTo(map);
         }
     }
+
+    function updateLoadingBar(data) {
+       
+            elem = document.getElementById("loader-distance-matrix-message")
+            if (data.distance_matrix_generation_ms == -1) {
+                elem.innerHTML = data.message;
+                elem.parentElement.setAttribute("class", 'loader-info')
+            } else {
+                elem.nextSibling.innerHTML = "&#x2705;"
+                elem.innerHTML = `Generated distance matrix  in ${data.distance_matrix_generation_ms.toPrecision(3)} s`;
+                elem.parentElement.setAttribute("class", 'loader-info')
+
+                elem = document.getElementById("loader-base-algorithm-message")
+                if (data.base_algorithm_ms == -1) {
+                    elem.innerHTML = `Performing ${data.method} algorithm`;
+                    elem.parentElement.setAttribute("class", 'loader-info')
+                } else {
+                    elem.nextSibling.innerHTML = "&#x2705;"
+                    elem.innerHTML = `${data.method}: found ${data.base_distance.toPrecision(3)} km route in ${data.base_algorithm_ms.toPrecision(3)} s`;
+                    elem.parentElement.setAttribute("class", 'loader-info')
+
+
+                    if (data.two_opt) {
+                        elem = document.getElementById("loader-two-opt-message")
+                        if (data.two_opt_ms == -1) {
+                            elem.innerHTML = `Optimising route with two-opt`;
+                            elem.parentElement.setAttribute("class", 'loader-info')
+                        }
+                        else {
+                            elem.nextSibling.innerHTML = "&#x2705;"
+                            elem.innerHTML = `Two-opt: shortened by ${data.two_opt_improvement.toPrecision(3)} km in ${data.two_opt_ms.toPrecision(3)} s`;
+                            elem.parentElement.setAttribute("class", 'loader-info')
+                            
+                            if (data.three_opt) {
+                                elem = document.getElementById("loader-three-opt-message")
+                                if (data.three_opt_ms == -1) {
+                                    elem.innerHTML = `Optimising route with three-opt`;
+                                    elem.parentElement.setAttribute("class", 'loader-info')
+                                }
+                                else {
+                                    elem.nextSibling.innerHTML = "&#x2705;"
+                                    elem.innerHTML = `Three-opt: shortened by ${data.three_opt_improvement.toPrecision(3)} km in ${data.three_opt_ms.toPrecision(3)} s`;
+                                    elem.parentElement.setAttribute("class", 'loader-info');
+                                }
+                            }
+                        } 
+                    }
+                }
+
+                if (data.status) {
+                    elem = document.getElementById("loader-status-message")
+                    elem.nextSibling.innerHTML = "&#x2705;"
+                    elem.innerHTML = "Processed";
+                    
+                    elem = document.getElementById('goToRoute').parentElement.setAttribute('class', 'loader-info');
+                }
+            }
+        }
 };
