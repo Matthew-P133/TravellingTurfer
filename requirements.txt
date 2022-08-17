@@ -10,12 +10,11 @@ click-plugins==1.1.1
 cligj==0.7.2
 cryptography==37.0.4
 Django==4.0.6
-Fiona==1.8.21
 geckodriver-autoinstaller==0.1.0
 geographiclib==1.52
 geojson==2.5.0
-geopandas==0.11.1
 geopy==2.2.0
+gunicorn==20.1.0
 h11==0.13.0
 idna==3.3
 munch==2.5.0
