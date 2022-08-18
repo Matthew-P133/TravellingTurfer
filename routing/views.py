@@ -62,7 +62,7 @@ def optimise(request):
             return HttpResponseBadRequest()
         if not all(isinstance(zone, int) for zone in zones):
             return HttpResponseBadRequest()
-        if len(zones) > 100:
+        if len(zones) > 100 or len(zones) == 0:
             return HttpResponseBadRequest()
 
         route = Route()

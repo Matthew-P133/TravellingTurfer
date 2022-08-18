@@ -174,9 +174,16 @@ window.onload = function () {
             credentials: 'same-origin',
         }).then(response => response.text())
         .then(function(response) {
-            document.getElementById('loader').setAttribute('class', 'overlay');
-            document.getElementById('id').innerHTML = response;
-            showLoading(response);
+            
+            if (response == '') {
+                overlay('Try again with between 3 and 100 zones!')
+            } else {
+                document.getElementById('loader').setAttribute('class', 'overlay');
+                document.getElementById('id').innerHTML = response;
+                showLoading(response);
+            }
+
+            
         })
         
         
@@ -332,5 +339,33 @@ window.onload = function () {
             
                 elem = document.getElementById('goToRoute').parentElement.setAttribute('class', 'overlay-item');
         }
+    }
+
+    function overlay(text) {
+
+        newOverlay = document.createElement('div')
+        newOverlay.setAttribute('class', 'overlay')
+
+        overlayItem = document.createElement('div')
+        overlayItem.setAttribute('class', 'alert')
+        
+        p = document.createElement('p')
+        p.innerHTML = text;
+        overlayItem.appendChild(p);
+
+        closeButton = document.createElement('div')
+        closeButton.setAttribute('class', 'close-button')
+        closeButton.innerHTML = "&#10060;"
+        closeButton.addEventListener('click', closeAlert);
+
+
+        newOverlay.appendChild(overlayItem);
+        newOverlay.appendChild(closeButton);
+        document.body.appendChild(newOverlay);
+    }
+
+    function closeAlert(e) {
+        console.log(e.target.parentNode)
+        e.target.parentNode.remove();
     }
 };
