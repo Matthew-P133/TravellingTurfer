@@ -42,5 +42,5 @@ fi
 
 # collect static files and run the server
 cd /code
-python manage.py collectstatic
+python manage.py collectstatic --no-input
 gunicorn TravellingTurfer.wsgi:application --bind 0.0.0.0:8000
