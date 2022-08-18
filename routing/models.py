@@ -45,7 +45,7 @@ class Route(models.Model):
 
     def getGeoJSON(self):
 
-        waypoints = Waypoints.objects.filter(route=self)
+        waypoints = Waypoints.objects.filter(route=self).order_by('position')
 
         coordinates = []
 

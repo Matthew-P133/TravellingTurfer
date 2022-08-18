@@ -182,12 +182,7 @@ window.onload = function () {
                 document.getElementById('id').innerHTML = response;
                 showLoading(response);
             }
-
-            
         })
-        
-        
-
     }
 
     function showLoading(id) {
