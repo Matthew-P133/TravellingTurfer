@@ -22,18 +22,21 @@ def populate():
 
     # add any new zones to the database
     for zone in zone_dict:
-       
-        if not Zone.objects.filter(id=zone['id']):
-            
-            new_zone = Zone(id=zone['id'], name=zone['name'], latitude=zone['latitude'], longitude=zone['longitude'], 
-                            date_created=zone['dateCreated'], takeovers=zone['totalTakeovers'], points_per_hour=zone['pointsPerHour'], 
-                            takeover_points=zone['takeoverPoints'])          
-            new_zones.append(new_zone)
 
-            # display progress in the terminal
-            count += 1
-            if (count % 100 == 0):
-                print(f"Added {count} new zones...", end='\r')
+        # limit to zones in scotland
+        if zone['region']['id'] == 200:
+       
+            if not Zone.objects.filter(id=zone['id']):
+            
+                new_zone = Zone(id=zone['id'], name=zone['name'], latitude=zone['latitude'], longitude=zone['longitude'], 
+                                date_created=zone['dateCreated'], takeovers=zone['totalTakeovers'], points_per_hour=zone['pointsPerHour'], 
+                                takeover_points=zone['takeoverPoints'])          
+                new_zones.append(new_zone)
+
+                # display progress in the terminal
+                count += 1
+                if (count % 100 == 0):
+                    print(f"Added {count} new zones...", end='\r')
             
     Zone.objects.bulk_create(new_zones)
     print(f"Successfully added {count} new zones")
