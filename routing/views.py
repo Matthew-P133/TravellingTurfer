@@ -107,7 +107,7 @@ def optimisation_job(route, zones, job):
             job.save()
             shortestRoute = bruteForce.optimise(zones, distanceMatrix)
         elif len(zones) <= 40:
-            job.method = "Christofide's"
+            job.method = "Christofides"
             job.save()
             shortestRoute = christofides.optimise(zones, distanceMatrix, job)
         else:
