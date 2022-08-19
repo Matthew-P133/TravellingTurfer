@@ -131,7 +131,7 @@ def optimisation_job(route, zones, job):
             job.two_opt_ms = end - start
             job.save()
 
-            if len(zones) < 75:
+            if len(zones) < 50:
                 job.message = "Optimising with 3-opt"
                 job.three_opt = True
                 job.save()
