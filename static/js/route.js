@@ -145,14 +145,15 @@ window.onload = function () {
 
     function downloadRoute() {
 
-        blob = new Blob([togpx(geoJSON)]);
+        blob = new Blob([togpx(geoJSON)], {type: 'application/gpx+xml'});
+        blob.se
         url = window.URL.createObjectURL(blob);
 
         a = document.createElement('a');
         document.body.appendChild(a);
         a.style = "display: none";
         a.href = url;
-        a.download = 'TravellingTurfer_Route' + id.toString() + ".gpx";
+        a.download = `TravellingTurfer_Route${id.toString()}.gpx`;
         a.click();
 
         window.URL.revokeObjectURL(url);
