@@ -115,7 +115,8 @@ def optimisation_job(route, zones, job):
             job.save()
             shortestRoute = nearestNeighbour.optimise(zones, distanceMatrix)
         end = time.time()
-        job.base_distance = routing_utils.distance(shortestRoute, distanceMatrix)
+        job.base_distance = job.shortest = routing_utils.distance(shortestRoute, distanceMatrix)
+       
         job.base_algorithm_ms = end - start
         job.save()
         
