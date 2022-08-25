@@ -6,8 +6,6 @@ import requests
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'TravellingTurfer.settings')
 django.setup()
 
-
-
 import math
 from routing.nearestNeighbour import optimise as nearest_neighbour
 from routing.christofides import optimise as christofides
@@ -17,7 +15,6 @@ from routing.threeOpt import optimise as threeopt
 import argparse
 
 algorithms = {'christofides': christofides, 'nearest-neighbour': nearest_neighbour, 'brute-force': brute_force}
-
 
 def main():
 
@@ -40,13 +37,12 @@ def main():
     try:
         with open(file, 'r') as file:
             for line in file:
-                if line[0].isdigit() and 'EOF' not in line:
-                    data = line.strip().split(' ')
-                    zone = Zone(data[0], data[1], data[2])
+                if line.strip()[0].isdigit() and 'EOF' not in line:
+                    data = line.strip().split()
+                    zone = Zone(data[0].lstrip('0'), data[1], data[2])
                     zones.append(zone)
                 if line.startswith('OPTIMUM'):
-                    optimum = line.strip('OPTIMUM ').strip().split(" ")
-
+                    optimum = line.strip('OPTIMUM ').strip().split()
     except:
         raise Exception("Problem with file")
                 
@@ -79,7 +75,6 @@ def main():
     optimum_distance = route_distance(optimum, distanceMatrix)
     print(f"distance of optimum route: {optimum_distance}")
     print(f"{round((distance/optimum_distance*100)-100, 2)}% above optimal route")
-
 
 
 #helper functions/classes
