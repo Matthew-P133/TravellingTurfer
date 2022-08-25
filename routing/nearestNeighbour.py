@@ -1,4 +1,4 @@
-from routing.models import Waypoints, Zone, Distance, Route
+
 
 def optimise(zones, distanceMatrix):
 
@@ -43,13 +43,4 @@ def step(route, notInRoute, distanceMatrix):
 
 
 
-def routeDistance(route):
 
-    distance = 0
-    for i, zone in enumerate(route):
-        if i != len(route)-1:
-            start = Zone.objects.get(id=route[i])
-            end = Zone.objects.get(id=route[i+1])
-            distance += Distance.objects.get(zone_a=start, zone_b=end).distance
-
-    return distance
