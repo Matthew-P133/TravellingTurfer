@@ -28,7 +28,7 @@ populate_zones.py is used for populating the database when the app is deployed f
 
 requirements.txt contains a list of python dependencies.
 
-.env_sample contains default contents for the .env file containing environment variables needed to run the app.
+sample.env contains default contents for the .env file containing environment variables needed to run the app.
 
 ## Usage
 
@@ -44,7 +44,7 @@ Next download or clone this repository.
 In a terminal window in the top project directory:
 
 ```
-mv .env_sample to .env
+mv sample.env .env
 docker-compose -f docker-compose.yml up
 ```
 
