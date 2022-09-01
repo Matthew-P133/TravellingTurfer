@@ -2,6 +2,8 @@
 
 Route optimisation tool for geo-location based game, Turf. At the time of writing, the app is available at https://travellingturfer.fun/map/
 
+Built as a project for the MSc in Software Development at the University of Glasgow.
+
 ## Project structure
 
 At the core of TravellingTurfer is a Django application. This is responsible for applying route optimisation algorithms to route optimisation jobs, as well as orchestrating application flow: rceiving and servicing requests from the frontend (custom CSS/HTML/JavaScript, built around leaflet); accessing the SQLite3 database (e.g., to store and retrieve routes); and obtaining real-world A-B distances between pairs of zones for use in distance matrices in route optimisation jobs from routing engine, GraphHopper.
