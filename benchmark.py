@@ -13,6 +13,7 @@ from routing.bruteForce import optimise as brute_force
 from routing.twoOpt import optimise as twoopt
 from routing.threeOpt import optimise as threeopt
 import argparse
+import time
 
 algorithms = {'christofides': christofides, 'nearest-neighbour': nearest_neighbour, 'brute-force': brute_force}
 
@@ -53,23 +54,32 @@ def main():
             distanceMatrix[start.id][end.id] = distanceMatrix[end.id][start.id] = pair_distance(start, end)
 
     # solve with base algorithm
+    start = time.time()
     try:
         route = algorithm([zone.id for zone in zones], distanceMatrix)
     except Exception:
         route = algorithm([zone.id for zone in zones], distanceMatrix, DummyJob())
+    end = time.time()
+    duration = end - start
     distance = route_distance(route, distanceMatrix)
-    print(f"{args.algorithm} generated route of length: {distance}")
+    print(f"{args.algorithm} generated route of length: {distance} in {duration} s")
 
     # improvement heuristics
     if twoopt_bool:
+        start = time.time()
         route = twoopt(route, distanceMatrix, DummyJob())
+        end = time.time()
+        duration = end - start
         distance = route_distance(route, distanceMatrix)
-        print(f"2-opt improved route to length: {distance}")
+        print(f"2-opt improved route to length: {distance} in {duration} s")
 
     if threeopt_bool:
+        start = time.time()
         route = threeopt(route, distanceMatrix, DummyJob())
+        end = time.time()
+        duration = end - start
         distance = route_distance(route, distanceMatrix)
-        print(f"3-opt improved route to length: {distance}")
+        print(f"3-opt improved route to length: {distance} in {duration} s")
 
     # optimum distance
     optimum_distance = route_distance(optimum, distanceMatrix)

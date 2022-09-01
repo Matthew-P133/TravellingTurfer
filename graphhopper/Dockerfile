@@ -6,6 +6,6 @@ COPY . .
 EXPOSE 8989
 
 # run routing engine, downloading files as necessary
-CMD ./launch
+CMD ./launch.sh
 
 
