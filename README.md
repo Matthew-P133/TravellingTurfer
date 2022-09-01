@@ -32,16 +32,26 @@ sample.env contains default contents for the .env file containing environment va
 
 ## Usage
 
-The easiest way to deploy the application locally is with Docker and Docker Compose. To install these in linux run:
+The easiest way to deploy the application locally is with Docker and Docker Compose. These instructions are written and tested for linux (but should also work in Windows with Docker-desktop and Windows Subsystem for Linux).
+
+To install these in linux run:
 
 ```
 apt install docker
 apt install docker-compose
 ```
 
-Next download or clone this repository.
+(In Windows you'll need to install Docker Desktop and Windows Subsystem for Linux)
 
-In a terminal window in the top project directory:
+Check that Docker is running:
+
+```
+docker info
+```
+
+Clone or download this repository.
+
+In a terminal navigate to the top-level project directory and run:
 
 ```
 mv sample.env .env
