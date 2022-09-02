@@ -49,7 +49,7 @@ Check that Docker is running:
 docker info
 ```
 
-Clone or download this repository.
+Clone (or download) this repository, making sure that the top-level directory (the one containing docker-compose.yml) is called 'TravellingTurfer'.
 
 In a terminal navigate to the top-level project directory and run:
 
@@ -58,13 +58,7 @@ mv sample.env .env
 docker-compose -f docker-compose.yml up
 ```
 
-This will build and spin up the various containers. Note that it can take a while on the first build (due to building docker images, downloading the GraphHopper executable and map data, GraphHopper parsing map data into RAM, and populating the database).
-
-You can check progress once the images have been built with:
-
-```
-docker-compose -f docker-compose.yml -f logs.
-```
+This will build and spin up the various containers. Note that the first build can take a few minutes (due to building docker images, downloading the GraphHopper executable and map data, GraphHopper parsing map data into RAM, and populating the database).
 
 Once everything is up you can access the application on: http://127.0.0.1:1337/
 
