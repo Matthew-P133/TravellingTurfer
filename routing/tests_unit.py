@@ -142,9 +142,10 @@ class OptimiseTest(TransactionTestCase):
         
         def test():
             
-            waypoints = Waypoints.objects.filter(route_id=id)
+            waypoints = Waypoints.objects.filter(route_id=id).order_by('position')
             self.assertEqual(len(waypoints), len(json.loads(payload))+1)
-            correctOrder = [15380, 173256, 15446, 173254, 15448, 15447, 173255, 15379, 15378, 16065, 16064, 16066, 16068, 16069, 15455, 411367, 496582, 16067, 15457, 476496, 15713, 15458, 15459, 476525, 15460, 476494, 476495, 411354, 411351, 411353, 328273, 15714, 15396, 15453, 15399, 323827, 15452, 346792, 16004, 15451, 16005, 173259, 516844, 15380]
+            correctOrder = [15380, 173256, 15446, 173254, 15448, 15447, 173255, 15379, 15378, 16065, 16064, 16066, 16068, 16069, 15455, 411367, 496582, 16067, 15457, 476496, 15713, 15458, 15459, 476525, 15460, 476494, 476495, 411354, 411351, 411353, 328273, 15714, 15396, 15453, 15399, 15452, 323827, 15451, 346792, 16004, 16005, 173259, 516844, 15380]
+
             for i, waypoint in enumerate(waypoints):
                 self.assertEqual(waypoint.position, i)
                 self.assertEqual(waypoint.zone_id, correctOrder[i])
