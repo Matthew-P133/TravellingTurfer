@@ -8,7 +8,7 @@ Built as a project for the MSc in Software Development at the University of Glas
 
 The easiest way to deploy the application locally is with Docker and Docker Compose. These instructions are written and tested for Linux (but should also work in Windows with Docker-desktop and Windows Subsystem for Linux).
 
-To install these in linux run:
+To install these in Linux run:
 
 ```
 apt install docker
