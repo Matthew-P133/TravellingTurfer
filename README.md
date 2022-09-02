@@ -28,7 +28,7 @@ Clone (or download) this repository, making sure that the top-level directory (t
 In a terminal navigate to the top-level project directory and run:
 
 ```
-mv sample.env .env
+cp sample.env .env
 docker-compose -f docker-compose.yml up
 ```
 
