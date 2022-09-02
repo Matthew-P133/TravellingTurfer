@@ -4,35 +4,9 @@ Route optimisation tool for geo-location based game, Turf. At the time of writin
 
 Built as a project for the MSc in Software Development at the University of Glasgow.
 
-## Project structure
-
-At the core of TravellingTurfer is a Django application. This is responsible for applying route optimisation algorithms to route optimisation jobs, as well as orchestrating application flow: rceiving and servicing requests from the frontend (custom CSS/HTML/JavaScript, built around leaflet); accessing the SQLite3 database (e.g., to store and retrieve routes); and obtaining real-world A-B distances between pairs of zones for use in distance matrices in route optimisation jobs from routing engine, GraphHopper.
-
-## Project layout
-
-/TravellingTurfer/ contains Django settings and configuration.
-
-Application logic including the route optimisation algorithms, and unit and integration tests can be found in /routing/.
-
-Frontend code is in /static/.
-
-/reference_TSP_solutions/ contains route optimisation tasks with know optimal solutions - these can be used to benchmark route optimisation algorithms using benchmark.py.
-
-/nginx/ and /graphhopper/ contain Dockerfiles and scripts for spinning up these dependencies.
-
-/db/ is an empty folder which the database goes in.
-
-Dockerfile, docker-compose.yml and launch.sh in the top level directory are used for deploying the app.
-
-populate_zones.py is used for populating the database when the app is deployed for the first time.
-
-requirements.txt contains a list of python dependencies.
-
-sample.env contains default contents for the .env file containing environment variables needed to run the app.
-
 ## Usage
 
-The easiest way to deploy the application locally is with Docker and Docker Compose. These instructions are written and tested for linux (but should also work in Windows with Docker-desktop and Windows Subsystem for Linux).
+The easiest way to deploy the application locally is with Docker and Docker Compose. These instructions are written and tested for Linux (but should also work in Windows with Docker-desktop and Windows Subsystem for Linux).
 
 To install these in linux run:
 
@@ -77,3 +51,29 @@ docker-compose -f docker-compose.yml down -v
 Future spin ups are much faster (~5 seconds).
 
 Have a look a the environment variables in .env (particularly PURGE_DB and POPULATE_DB) for future spin ups.
+
+## Project structure
+
+At the core of TravellingTurfer is a Django application. This is responsible for applying route optimisation algorithms to route optimisation jobs, as well as orchestrating application flow: rceiving and servicing requests from the frontend (custom CSS/HTML/JavaScript, built around leaflet); accessing the SQLite3 database (e.g., to store and retrieve routes); and obtaining real-world A-B distances between pairs of zones for use in distance matrices in route optimisation jobs from routing engine, GraphHopper.
+
+## Project layout
+
+/TravellingTurfer/ contains Django settings and configuration.
+
+Application logic including the route optimisation algorithms, and unit and integration tests can be found in /routing/.
+
+Frontend code is in /static/.
+
+/reference_TSP_solutions/ contains route optimisation tasks with know optimal solutions - these can be used to benchmark route optimisation algorithms using benchmark.py.
+
+/nginx/ and /graphhopper/ contain Dockerfiles and scripts for spinning up these dependencies.
+
+/db/ is an empty folder which the database goes in.
+
+Dockerfile, docker-compose.yml and launch.sh in the top level directory are used for deploying the app.
+
+populate_zones.py is used for populating the database when the app is deployed for the first time.
+
+requirements.txt contains a list of python dependencies.
+
+sample.env contains default contents for the .env file containing environment variables needed to run the app.
