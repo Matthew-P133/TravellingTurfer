@@ -14,6 +14,7 @@ To run the project with default settings, navigate to the top-level project dire
 
 ```
 cp sample.env .env
+mkdir -p volumes/db volumes/graphhopper_data volumes/static
 docker-compose up --build -d
 ```
 
@@ -38,7 +39,9 @@ The containers for GraphHopper and the Django Application keep persistent data i
 
 This makes future spin ups much faster because the map data does not need to be redownloaded and re-parsed by graphhopper.
 
-Have a look a the environment variables in .env (particularly PURGE_DB and POPULATE_DB) for future spin ups.
+Have a look a the environment variables in .env (particularly PURGE_DB and UPDATE_ZONES) for future spin ups.
+
+N.B. For future spin ups PURGE_DB and UPDATE_ZONES should probably be set to zero (the Turf api endpoint for downloading all zones can only be hit once every 30 mins per IP address).
 
 ## Making changes
 
@@ -68,6 +71,8 @@ MAP_DOWNLOAD_FOLDER=https://download.geofabrik.de/europe/germany/
 ```
 docker-compose down && docker-compose up --build -d
 ```
+
+N.B. You'd probably also want to change the populate_zone.py script to put the german zones into the database (not covered here).
 
 ## Project structure
 
