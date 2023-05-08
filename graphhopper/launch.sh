@@ -4,19 +4,21 @@
 
 cd graphhopper_data
 
-if test -f "$graphhopper_executable"; then
+if test -f "$GRAPHHOPPER_EXECUTABLE"; then
     echo "Using cached graphhopper executable"
 else
     echo "Downloading graphhopper executable"
-    wget --progress=dot:mega "$graphhopper_download_folder$graphhopper_executable"
+    wget --progress=dot:mega "$GRAPHHOPPER_DOWNLOAD_FOLDEr$GRAPHHOPPER_EXECUTABLE"
 fi
 
-if test -f "$map_file"; then
+if test -f "$MAP_FILE"; then
     echo "Using cached map file"
 else
     echo "Downloading map file"
-    wget --progress=dot:mega "$map_download_folder$map_file"
+    wget --progress=dot:mega "$MAP_DOWNLOAD_FOLDER$MAP_FILE"
 fi
 
 # launches instance of graphhopper routing engine
-java -Ddw.graphhopper.datareader.file=$map_file -jar $graphhopper_executable server /config.yml
+java -Ddw.graphhopper.datareader.file=$MAP_FILE -jar $GRAPHHOPPER_EXECUTABLE server /config.yml
+
+

@@ -3,11 +3,10 @@ version: '3.3'
 services:
 
   web:
+    container_name: tt_web
+    image: tt_web
     build:
       context: .
-      args:
-        PURGE_DB: ${PURGE_DB}
-        UPDATE_ZONES: ${UPDATE_ZONES}
       dockerfile: Dockerfile
     volumes:
       - type: bind
@@ -18,10 +17,18 @@ services:
         target: /code/db
     expose:
       - 8000
-    env_file:
-      - ./.env
+    environment:
+      - GRAPHHOPPER_ADDRESS=$GRAPHHOPPER_ADDRESS
+      - SECRET_KEY=$SECRET_KEY
+      - DEBUG=$DEBUG
+      - DJANGO_ALLOWED_HOSTS=$DJANGO_ALLOWED_HOSTS
+      - TRUSTED_ORIGINS=$TRUSTED_ORIGINS
+      - PURGE_DB=$PURGE_DB
+      - UPDATE_ZONES=$UPDATE_ZONES
 
   nginx:
+    container_name: tt_nginx
+    image: tt_nginx
     build: ./nginx
     volumes:
       - type: bind
@@ -33,6 +40,8 @@ services:
       - web
 
   graphhopper:
+    container_name: tt_graphhopper
+    image: tt_graphhopper
     build: ./graphhopper
     expose:
       - 8989
@@ -40,5 +49,8 @@ services:
       - type: bind
         source: ./volumes/graphhopper_data
         target: /graphhopper_data
-    env_file:
-    - ./.env
+    environment:
+      - GRAPHHOPPER_EXECUTABLE=$GRAPHHOPPER_EXECUTABLE
+      - GRAPHHOPPER_DOWNLOAD_FOLDER=$GRAPHHOPPER_DOWNLOAD_FOLDER
+      - MAP_FILE=$MAP_FILE
+      - MAP_DOWNLOAD_FOLDER=$MAP_DOWNLOAD_FOLDER
