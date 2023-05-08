@@ -1,16 +1,8 @@
 #!/bin/bash
 
-# check that we have the relevant files (and get them if necessary)
+cd /graphhopper_data
 
-cd graphhopper_data
-
-if test -f "$GRAPHHOPPER_EXECUTABLE"; then
-    echo "Using cached graphhopper executable"
-else
-    echo "Downloading graphhopper executable"
-    wget --progress=dot:mega "$GRAPHHOPPER_DOWNLOAD_FOLDEr$GRAPHHOPPER_EXECUTABLE"
-fi
-
+# check that we have the map (and get it if necessary)
 if test -f "$MAP_FILE"; then
     echo "Using cached map file"
 else
@@ -19,6 +11,6 @@ else
 fi
 
 # launches instance of graphhopper routing engine
-java -Ddw.graphhopper.datareader.file=$MAP_FILE -jar $GRAPHHOPPER_EXECUTABLE server /config.yml
+java -Ddw.graphhopper.datareader.file=$MAP_FILE -jar graphhopper-web-5.3.jar server /config.yml
 
 

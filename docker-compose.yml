@@ -50,7 +50,5 @@ services:
         source: ./volumes/graphhopper_data
         target: /graphhopper_data
     environment:
-      - GRAPHHOPPER_EXECUTABLE=$GRAPHHOPPER_EXECUTABLE
-      - GRAPHHOPPER_DOWNLOAD_FOLDER=$GRAPHHOPPER_DOWNLOAD_FOLDER
       - MAP_FILE=$MAP_FILE
       - MAP_DOWNLOAD_FOLDER=$MAP_DOWNLOAD_FOLDER
