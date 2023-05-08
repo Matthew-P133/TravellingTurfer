@@ -2,6 +2,8 @@
 
 # check that we have the relevant files (and get them if necessary)
 
+cd graphhopper_data
+
 if test -f "$graphhopper_executable"; then
     echo "Using cached graphhopper executable"
 else
@@ -17,4 +19,4 @@ else
 fi
 
 # launches instance of graphhopper routing engine
-java -Ddw.graphhopper.datareader.file=$map_file -jar $graphhopper_executable server config.yml
+java -Ddw.graphhopper.datareader.file=$map_file -jar $graphhopper_executable server /config.yml
