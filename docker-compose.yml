@@ -22,7 +22,7 @@ services:
       - SECRET_KEY=$SECRET_KEY
       - DEBUG=$DEBUG
       - DJANGO_ALLOWED_HOSTS=$DJANGO_ALLOWED_HOSTS
-      - TRUSTED_ORIGINS=$TRUSTED_ORIGINS
+      - TRUSTED_ORIGINS=$TT_HOST:$TT_PORT
       - PURGE_DB=$PURGE_DB
       - UPDATE_ZONES=$UPDATE_ZONES
 
@@ -35,7 +35,7 @@ services:
         source: ./volumes/static
         target: /code/staticfiles
     ports:
-      - 1337:80
+      - $TT_PORT:80
     depends_on:
       - web
 
