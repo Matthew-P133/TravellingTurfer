@@ -11,8 +11,8 @@ RUN pip install -r requirements.txt
 # copy project
 COPY . /code
 
-# set up database and launch server
-CMD ./launch.sh
+# set up database and launch travelling turfer
+ENTRYPOINT ./entrypoint.sh
 
 
 
