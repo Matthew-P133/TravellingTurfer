@@ -64,7 +64,11 @@ docker-compose down && docker-compose up --build
 
 ## Project structure
 
-At the core of TravellingTurfer is a Django application. This is responsible for applying route optimisation algorithms to route optimisation jobs, as well as orchestrating application flow: receiving and servicing requests from the frontend (custom CSS/HTML/JavaScript, built around leaflet); accessing the SQLite3 database (e.g., to store and retrieve routes); and obtaining real-world A-B distances between pairs of zones for use in distance matrices in route optimisation jobs from routing engine, GraphHopper.
+Travelling Turfer deployments are made up of three containers:
+
+1. tt_web - the main Travelling Turfer (Django) web application. This is responsible for applying route optimisation algorithms to route optimisation jobs, as well as orchestrating application flow: receiving and servicing requests from the frontend (custom CSS/HTML/JavaScript, built around leaflet); accessing the SQLite3 database (e.g., to store and retrieve routes); and obtaining real-world A-B distances between pairs of zones for use in distance matrices in route optimisation jobs from routing engine, GraphHopper.
+2. tt_graphhopper - the routing engine which Travelling Turfer uses for raw A->B distances for distance matrix generation.
+3. tt_nginx - a reverse web proxy which serves the application
 
 ## Project layout
 
