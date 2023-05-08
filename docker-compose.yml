@@ -6,7 +6,7 @@ services:
     container_name: tt_web
     image: tt_web
     build:
-      context: .
+      context: ./web
       dockerfile: Dockerfile
     volumes:
       - type: bind
