@@ -14,10 +14,17 @@ To run the project with default settings, navigate to the top-level project dire
 
 ```
 cp sample.env .env
-docker-compose up --build
+docker-compose up --build -d
 ```
 
 This will build and spin up the various containers. Note that the first build can take a few minutes (due to building docker images, downloading the GraphHopper executable and map data, GraphHopper parsing map data into RAM, and populating the database).
+
+To see progress, view the logs:
+
+```
+docker-compose -f logs
+# ctrl-c to exit
+```
 
 Once everything is up you can access the application on: http://127.0.0.1:10000/
 
@@ -44,7 +51,7 @@ docker-compose down
 ```
 3. Spin the containers back up (the --build flag ensures the docker images are rebuilt with the new code):
 ```
-docker-compose up --build
+docker-compose up --build -d
 ```
 
 Config changes (e.g. changing the map used):
@@ -59,7 +66,7 @@ MAP_DOWNLOAD_FOLDER=https://download.geofabrik.de/europe/germany/
 ```
 3. Spin down and up the containers:
 ```
-docker-compose down && docker-compose up --build
+docker-compose down && docker-compose up --build -d
 ```
 
 ## Project structure
