@@ -31,7 +31,7 @@ fi
 
 # apply any migrations
 cd /code
-python manage.py makemigrations
+python manage.py makemigrations routing
 python manage.py migrate
 
 if [ $UPDATE_ZONES -eq 1 ]; then

@@ -11,6 +11,6 @@ else
 fi
 
 # launches instance of graphhopper routing engine
-java -Ddw.graphhopper.datareader.file=$MAP_FILE -jar graphhopper-web-5.3.jar server /config.yml
+java -Ddw.graphhopper.datareader.file=$MAP_FILE -jar /graphhopper-web-5.3.jar server /config.yml
 
 
