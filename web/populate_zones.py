@@ -3,6 +3,7 @@ import django
 from django.conf import settings
 import os
 import requests
+from pathlib import Path
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'TravellingTurfer.settings')
 django.setup()
@@ -14,32 +15,38 @@ import json
 def populate():
 
     # query turf api for all zones
-    x = requests.get("http://api.turfgame.com/v4/zones/all")
-    zone_dict = json.loads(x.content)
+    # x = requests.get("http://api.turfgame.com/v4/zones/all")
+    # zone_dict = json.loads(x.content)
 
-    new_zones = []
-    count = 0
+    zone_file_path = f"{Path(__file__).resolve().parent}/db/turf_zones.json"
+    print(zone_file_path)
+    with open(zone_file_path, "r") as fp:
+        zone_dict = json.load(fp)
+    
 
-    # add any new zones to the database
-    for zone in zone_dict:
+        new_zones = []
+        count = 0
 
-        # limit to zones in scotland
-        if zone['region']['id'] == 200:
-       
-            if not Zone.objects.filter(id=zone['id']):
-            
-                new_zone = Zone(id=zone['id'], name=zone['name'], latitude=zone['latitude'], longitude=zone['longitude'], 
-                                date_created=zone['dateCreated'], takeovers=zone['totalTakeovers'], points_per_hour=zone['pointsPerHour'], 
-                                takeover_points=zone['takeoverPoints'])          
-                new_zones.append(new_zone)
+        # add any new zones to the database
+        for zone in zone_dict:
 
-                # display progress in the terminal
-                count += 1
-                if (count % 100 == 0):
-                    print(f"Added {count} new zones...", end='\r')
-            
-    Zone.objects.bulk_create(new_zones)
-    print(f"Successfully added {count} new zones")
+            # limit to zones in scotland
+            if zone['region']['id'] == 200:
+        
+                if not Zone.objects.filter(id=zone['id']):
+                
+                    new_zone = Zone(id=zone['id'], name=zone['name'], latitude=zone['latitude'], longitude=zone['longitude'], 
+                                    date_created=zone['dateCreated'], takeovers=zone['totalTakeovers'], points_per_hour=zone['pointsPerHour'], 
+                                    takeover_points=zone['takeoverPoints'])          
+                    new_zones.append(new_zone)
+
+                    # display progress in the terminal
+                    count += 1
+                    if (count % 100 == 0):
+                        print(f"Added {count} new zones...", end='\r')
+                
+        Zone.objects.bulk_create(new_zones)
+        print(f"Successfully added {count} new zones")
 
     
 if (__name__ == '__main__'):
